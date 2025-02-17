@@ -1,5 +1,8 @@
 package com.example.ballup_backend.projection.user;
 
+
+import com.example.ballup_backend.entity.UserEntity.Role;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -12,6 +15,6 @@ import lombok.experimental.FieldDefaults;
 public class UserDetailProjection {
     String username;
     String email;
-    Byte role;
+    Role role;
     
 }
