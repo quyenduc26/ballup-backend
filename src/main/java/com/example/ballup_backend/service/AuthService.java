@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.example.ballup_backend.dto.req.authRequest.LoginRequest;
 import com.example.ballup_backend.dto.req.authRequest.RegisterRequest;
 import com.example.ballup_backend.entity.UserEntity;
+import com.example.ballup_backend.entity.UserEntity.Role;
 import com.example.ballup_backend.exception.BaseException;
 import com.example.ballup_backend.exception.ErrorCodeEnum;
 import com.example.ballup_backend.repository.UserRepository;
@@ -29,19 +30,18 @@ public class AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public String registerUser(RegisterRequest request) {
+    public UserEntity registerUser(RegisterRequest request) {
         if (userRepository.findByUsernameOrEmail(request.getUsername(), request.getEmail()).isPresent()) {
             throw new BaseException(ErrorCodeEnum.USER_ALREADY_EXITS, HttpStatus.CONFLICT);
         }
+
         UserEntity user = UserEntity.builder()
                 .username(request.getUsername())
-                .email(request.getEmail())
+                .email(request.getEmail()) 
                 .password(passwordEncoder.encode(request.getPassword())) 
-                .role((byte) 0)
+                .role(request.getRole().equals("user") ? Role.USER : Role.OWNER)
                 .build();
-        userRepository.save(user);
-
-        return "User registered successfully!";
+        return userRepository.save(user);
     }
 
     public String loginUser(LoginRequest request) {
