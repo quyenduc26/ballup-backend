@@ -1,0 +1,22 @@
+package com.example.ballup_backend.projection.user;
+
+import com.example.ballup_backend.entity.UserEntity.Role;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class UserGoogleData {
+    String googleId;
+    String username;
+    String email;
+    Role role;
+    String firstname;
+    String lastname;
+    String avatar;
+}
