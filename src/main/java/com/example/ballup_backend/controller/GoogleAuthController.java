@@ -3,13 +3,12 @@ package com.example.ballup_backend.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.view.RedirectView;
 
 import com.example.ballup_backend.config.GoogleOAuthConfig;
-import com.example.ballup_backend.entity.UserEntity;
 import com.example.ballup_backend.entity.UserEntity.Role;
 import com.example.ballup_backend.projection.user.UserGoogleData;
 import com.example.ballup_backend.service.AuthService;
-import com.example.ballup_backend.service.UserService;
 
 import org.springframework.web.bind.annotation.*;
 
@@ -29,19 +28,21 @@ public class GoogleAuthController {
     private AuthService authService;
 
     
-
     @GetMapping("/callback")
-    public ResponseEntity<?> googleCallback(@RequestParam("code") String code) {
+    public RedirectView googleCallback(@RequestParam("code") String code) {
         String accessToken = getAccessToken(code);
         Map<String, Object> userInfo = getUserInfo(accessToken);
         UserGoogleData userGoogleData = mapToUserGoogleData(userInfo);
         String jwtToken = authService.saveOrUpdateGoogleUser(userGoogleData);
-        return ResponseEntity.ok(jwtToken);
+        if (jwtToken == null || jwtToken.isEmpty()) {
+            return new RedirectView("http://localhost:3000/auth/login");
+        }
+    
+        return new RedirectView("http://localhost:3000/auth/success?token=" + jwtToken);
     }
 
     private String getAccessToken(String code) {
         RestTemplate restTemplate = new RestTemplate();
-
         Map<String, String> body = new HashMap<>();
         body.put("code", code);
         body.put("client_id", googleOAuthConfig.getClientId());
