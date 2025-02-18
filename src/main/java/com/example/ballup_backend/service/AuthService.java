@@ -1,5 +1,7 @@
 package com.example.ballup_backend.service;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -11,6 +13,7 @@ import com.example.ballup_backend.entity.UserEntity;
 import com.example.ballup_backend.entity.UserEntity.Role;
 import com.example.ballup_backend.exception.BaseException;
 import com.example.ballup_backend.exception.ErrorCodeEnum;
+import com.example.ballup_backend.projection.user.UserGoogleData;
 import com.example.ballup_backend.repository.UserRepository;
 import com.example.ballup_backend.util.jwt.JwtUtil;
 
@@ -53,5 +56,32 @@ public class AuthService {
 
         return jwtUtil.generateToken(user.getUsername());
     }
+
+    public String saveOrUpdateGoogleUser(UserGoogleData userGoogleData) {
+        Optional<UserEntity> existingUserOpt = userRepository.findByEmail(userGoogleData.getEmail());
+    
+        if (existingUserOpt.isPresent()) {
+            UserEntity existingUser = existingUserOpt.get();
+            existingUser.setGoogleId(userGoogleData.getGoogleId());
+            existingUser.setUsername(userGoogleData.getUsername());
+            existingUser.setFirstName(userGoogleData.getFirstname());
+            existingUser.setLastName(userGoogleData.getLastname());
+            existingUser.setAvatar(userGoogleData.getAvatar());
+            
+            return jwtUtil.generateToken(existingUser.getUsername());
+        }
+    
+        UserEntity newUser = UserEntity.builder()
+                .googleId(userGoogleData.getGoogleId())
+                .email(userGoogleData.getEmail())
+                .username(userGoogleData.getUsername())
+                .firstName(userGoogleData.getFirstname())
+                .lastName(userGoogleData.getLastname())
+                .avatar(userGoogleData.getAvatar())
+                .role(userGoogleData.getRole())
+                .build();
+        return jwtUtil.generateToken(newUser.getUsername());
+    }
+    
 }
     

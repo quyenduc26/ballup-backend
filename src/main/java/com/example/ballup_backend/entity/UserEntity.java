@@ -39,8 +39,11 @@ public class UserEntity {
     @Column(name = "last_name", nullable = true, length = 100)
     private String lastName;
 
-    @Column(name = "password", nullable = false, length = 255)
+    @Column(name = "password", nullable = true, length = 255)
     private String password;
+
+    @Column(name = "google_id", nullable = true, length = 255)
+    private String googleId;
 
     @Column(name = "avatar", nullable = true, length = 255 )
     private String avatar;
