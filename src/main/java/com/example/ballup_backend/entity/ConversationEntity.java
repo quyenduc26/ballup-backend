@@ -2,10 +2,12 @@ package com.example.ballup_backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.Instant;
+import java.sql.Timestamp;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
-@Table(name = "Conversation")
+@Table(name = "conversation")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,11 +17,14 @@ public class ConversationEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "conversation_id")
+    @Column(name = "id")
     private Integer id;
 
-    @Builder.Default
+    @Column(name = "name", nullable = false, length = 256)
+    private String name;
+
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
-    private Instant createdAt = Instant.now();
+    private Timestamp createdAt;
 }
 

@@ -1,4 +1,9 @@
 package com.example.ballup_backend.entity;
+import java.sql.Timestamp;
+import java.time.Instant;
+
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -14,7 +19,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "User")
+@Table(name = "user")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,7 +29,7 @@ public class UserEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
+    @Column(name = "id")
     private Integer id;
 
     @Column(name = "username", nullable = false, length = 50, unique = true) 
@@ -55,6 +60,10 @@ public class UserEntity {
     @Enumerated(EnumType.STRING) 
     @Column(name = "role", nullable = false)
     private Role role;
+
+    @Column(name = "created_at", nullable = false)
+    @CreationTimestamp
+    private Timestamp createdAt;
 
     public enum Role {
         USER, OWNER, ADMIN

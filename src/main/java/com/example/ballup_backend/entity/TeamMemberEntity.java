@@ -1,10 +1,12 @@
 package com.example.ballup_backend.entity;import java.security.Timestamp;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "Team_member")
+@Table(name = "team-member")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -25,6 +27,7 @@ public class TeamMemberEntity {
     @JoinColumn(name = "team_id", nullable = false)
     private TeamEntity team;
 
-    @Column(name = "create_at", updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private Timestamp createAt;
+    @Column(name = "created_at", nullable = false)
+    @CreationTimestamp
+    private Timestamp createdAt;
 }

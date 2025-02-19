@@ -3,9 +3,12 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.security.Timestamp;
+import java.time.Instant;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
-@Table(name = "Message")
+@Table(name = "message")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,7 +18,7 @@ public class MessageEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "message_id")
+    @Column(name = "id")
     private Long messageId;
 
     @ManyToOne
@@ -33,8 +36,9 @@ public class MessageEntity {
     @Column(name = "type", nullable = false)
     private MessageType type;
 
-    @Column(name = "create_at", updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private Timestamp createAt;
+    @Column(name = "created_at", nullable = false)
+    @CreationTimestamp
+    private Timestamp createdAt;
 
     public enum MessageType {
         TEXT, IMAGE, VIDEO

@@ -2,10 +2,11 @@ package com.example.ballup_backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.Instant;
+import java.sql.Timestamp;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
-@Table(name = "Payment")
+@Table(name = "payment")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,17 +16,25 @@ public class PaymentEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "payment_id")
+    @Column(name = "id")
     private Integer id;
-
-    @OneToOne
-    @JoinColumn(name = "booking_field_id", nullable = false, unique = true)
-    private BookingFieldEntity bookingField;
 
     @Column(name = "amount", nullable = false)
     private Integer amount;
 
-    @Column(name = "created", nullable = false)
-    @Builder.Default
-    private Instant created = Instant.now();
+    @ManyToOne
+    @JoinColumn(name = "creator", nullable = false)
+    private UserEntity creator;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private PaymentStatus status;
+
+    public enum PaymentStatus {
+        PENDING, SUCCESS, FAIL
+    }
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @CreationTimestamp
+    private Timestamp createdAt;
 }

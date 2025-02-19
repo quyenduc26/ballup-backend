@@ -2,31 +2,36 @@ package com.example.ballup_backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.Instant;
+import java.sql.Timestamp;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
-@Table(name = "Booking_Field")
+@Table(name = "slot_availability")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BookingFieldEntity {
+public class SlotAvalabilityEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "booking_field_id")
+    @Column(name = "id")
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "field_id", nullable = false)
-    private FieldEntity field;
+    @JoinColumn(name = "game_id", nullable = false)
+    private GameEntity game;
 
     @Column(name = "start_time", nullable = false)
-    private Instant startTime;
+    private Timestamp startTime;
 
     @Column(name = "return_time", nullable = false)
-    private Instant returnTime;
+    private Timestamp returnTime;
+
+    @ManyToOne
+    @JoinColumn(name = "creator", nullable = false)
+    private UserEntity creator;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
@@ -36,7 +41,11 @@ public class BookingFieldEntity {
         REQUESTED, CONFIRMED, REJECTED, DEPOSITED, COMPLETED
     }
 
-    @Builder.Default
+    @OneToOne
+    @JoinColumn(name = "payment_id", unique = true)
+    private PaymentEntity payment;
+
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
-    private Instant createdAt = Instant.now();
+    private Timestamp createdAt;
 }

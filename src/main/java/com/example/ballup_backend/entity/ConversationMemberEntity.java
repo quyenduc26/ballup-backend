@@ -1,8 +1,12 @@
-package com.example.ballup_backend.entity;import jakarta.persistence.*;
+package com.example.ballup_backend.entity;import java.sql.Timestamp;
+
+import org.hibernate.annotations.CreationTimestamp;
+
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "Conversation_Members")
+@Table(name = "member-conversation")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -12,7 +16,7 @@ public class ConversationMemberEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "conversation_member_id")
+    @Column(name = "id")
     private Long id;
 
     @ManyToOne
@@ -22,4 +26,8 @@ public class ConversationMemberEntity {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Timestamp createdAt;
 }
