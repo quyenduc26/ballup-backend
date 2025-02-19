@@ -20,7 +20,7 @@ public class GameEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private Long id;
 
     @Column(name = "time", nullable = false)
     private Timestamp time; 

@@ -7,8 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.example.ballup_backend.dto.req.authRequest.LoginRequest;
-import com.example.ballup_backend.dto.req.authRequest.RegisterRequest;
+import com.example.ballup_backend.dto.req.auth.LoginRequest;
+import com.example.ballup_backend.dto.req.auth.RegisterRequest;
 import com.example.ballup_backend.entity.UserEntity;
 import com.example.ballup_backend.entity.UserEntity.Role;
 import com.example.ballup_backend.exception.BaseException;

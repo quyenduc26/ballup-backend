@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
-@Table(name = "slot_availability")
+@Table(name = "slot-availability")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,7 +17,7 @@ public class SlotAvalabilityEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "game_id", nullable = false)

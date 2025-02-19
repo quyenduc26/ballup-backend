@@ -19,7 +19,7 @@ public class PlayingCenterEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private Long id;
 
     @Column(name = "name", nullable = false, length = 256)
     private String name;
@@ -31,9 +31,6 @@ public class PlayingCenterEntity {
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
     private UserEntity owner;
-
-    @Column(name = "image", length = 256)
-    private String image;
 
     @Column(name = "description", length = 256)
     private String description;

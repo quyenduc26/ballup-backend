@@ -19,7 +19,7 @@ public class PlayingSlotEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private Long id;
 
     @Column(name = "name", nullable = false, length = 255)
     private String name;
@@ -32,7 +32,7 @@ public class PlayingSlotEntity {
 
     @ManyToOne
     @JoinColumn(name = "playing_center_id", nullable = false)
-    private PlayingCenterEntity playcenter ;
+    private PlayingCenterEntity playingCenter ;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
