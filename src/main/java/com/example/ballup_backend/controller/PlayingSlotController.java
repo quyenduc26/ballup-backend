@@ -14,7 +14,7 @@ import com.example.ballup_backend.service.PlayingSlotService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/slot") 
+@RequestMapping("owner/slot") 
 public class PlayingSlotController {
 
     @Autowired

@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 
 @RestController
-@RequestMapping("/")
-public class HelloController {
+@RequestMapping("/admin")
+public class AdminController {
     
-    @GetMapping("/hello")
+    @GetMapping
     public ResponseEntity<String> login() {
-        return ResponseEntity.ok("Hello checkk");
+        return ResponseEntity.ok("Hello admin check");
     }
     
 }
