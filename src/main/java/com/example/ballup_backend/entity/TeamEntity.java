@@ -3,12 +3,15 @@ package com.example.ballup_backend.entity;
 
 
 import java.security.Timestamp;
+import java.time.Instant;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "Team")
+@Table(name = "team")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,14 +21,15 @@ public class TeamEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "team_id")
+    @Column(name = "id")
     private Long teamId;
 
     @Column(name = "name", length = 256, nullable = false)
     private String name;
 
-    @Column(name = "create_at", updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private Timestamp createAt;
+    @Column(name = "created_at", nullable = false)
+    @CreationTimestamp
+    private Instant createdAt;
 
     @Column(name = "address", length = 256)
     private String address;

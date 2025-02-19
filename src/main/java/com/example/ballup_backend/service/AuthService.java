@@ -7,8 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.example.ballup_backend.dto.req.authRequest.LoginRequest;
-import com.example.ballup_backend.dto.req.authRequest.RegisterRequest;
+import com.example.ballup_backend.dto.req.auth.LoginRequest;
+import com.example.ballup_backend.dto.req.auth.RegisterRequest;
 import com.example.ballup_backend.entity.UserEntity;
 import com.example.ballup_backend.entity.UserEntity.Role;
 import com.example.ballup_backend.exception.BaseException;
@@ -60,28 +60,30 @@ public class AuthService {
     public String saveOrUpdateGoogleUser(UserGoogleData userGoogleData) {
         Optional<UserEntity> existingUserOpt = userRepository.findByEmail(userGoogleData.getEmail());
     
+        UserEntity user;
+        
         if (existingUserOpt.isPresent()) {
-            UserEntity existingUser = existingUserOpt.get();
-            existingUser.setGoogleId(userGoogleData.getGoogleId());
-            existingUser.setUsername(userGoogleData.getUsername());
-            existingUser.setFirstName(userGoogleData.getFirstname());
-            existingUser.setLastName(userGoogleData.getLastname());
-            existingUser.setAvatar(userGoogleData.getAvatar());
-            
-            return jwtUtil.generateToken(existingUser.getUsername());
+            user = existingUserOpt.get();
+            user.setGoogleId(userGoogleData.getGoogleId());
+            user.setUsername(userGoogleData.getUsername());
+            user.setFirstName(userGoogleData.getFirstname());
+            user.setLastName(userGoogleData.getLastname());
+            user.setAvatar(userGoogleData.getAvatar());
+        } else {
+            user = UserEntity.builder()
+                    .googleId(userGoogleData.getGoogleId())
+                    .email(userGoogleData.getEmail())
+                    .username(userGoogleData.getUsername())
+                    .firstName(userGoogleData.getFirstname())
+                    .lastName(userGoogleData.getLastname())
+                    .avatar(userGoogleData.getAvatar())
+                    .role(userGoogleData.getRole())
+                    .build();
         }
-    
-        UserEntity newUser = UserEntity.builder()
-                .googleId(userGoogleData.getGoogleId())
-                .email(userGoogleData.getEmail())
-                .username(userGoogleData.getUsername())
-                .firstName(userGoogleData.getFirstname())
-                .lastName(userGoogleData.getLastname())
-                .avatar(userGoogleData.getAvatar())
-                .role(userGoogleData.getRole())
-                .build();
-        return jwtUtil.generateToken(newUser.getUsername());
+        user = userRepository.save(user);
+        return jwtUtil.generateToken(user.getUsername());
     }
+    
     
 }
     

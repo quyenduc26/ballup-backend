@@ -2,21 +2,24 @@ package com.example.ballup_backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.sql.Timestamp;
 import java.time.Instant;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 @Entity
-@Table(name = "Field")
+@Table(name = "playing-slot")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class FieldEntity {
+public class PlayingSlotEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "field_id")
-    private Integer id;
+    @Column(name = "id")
+    private Long id;
 
     @Column(name = "name", nullable = false, length = 255)
     private String name;
@@ -28,10 +31,10 @@ public class FieldEntity {
     private Integer nightPrice;
 
     @ManyToOne
-    @JoinColumn(name = "stadium_id", nullable = false)
-    private StadiumEntity stadium;
+    @JoinColumn(name = "playing_center_id", nullable = false)
+    private PlayingCenterEntity playingCenter ;
 
-    @Builder.Default
-    @Column(name = "create_at", nullable = false, updatable = false)
-    private Instant createdAt = Instant.now();
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Timestamp createdAt;
 }

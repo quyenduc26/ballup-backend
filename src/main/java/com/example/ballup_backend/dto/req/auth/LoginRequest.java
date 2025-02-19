@@ -1,4 +1,4 @@
-package com.example.ballup_backend.dto.req.authRequest;
+package com.example.ballup_backend.dto.req.auth;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

@@ -3,6 +3,7 @@ package com.example.ballup_backend.controller;
 import java.net.URI;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.ballup_backend.dto.req.authRequest.LoginRequest;
-import com.example.ballup_backend.dto.req.authRequest.RegisterRequest;
+import com.example.ballup_backend.dto.req.auth.LoginRequest;
+import com.example.ballup_backend.dto.req.auth.RegisterRequest;
 import com.example.ballup_backend.entity.UserEntity;
 import com.example.ballup_backend.service.AuthService;
 
@@ -28,9 +29,8 @@ public class AuthController {
 
    @PostMapping("/register")
     public ResponseEntity<String> register(@Valid @RequestBody RegisterRequest request) {
-        UserEntity user = authService.registerUser(request);
-        URI location = URI.create("/users/" + user.getId());
-        return ResponseEntity.created(location).body("User registered successfully!");
+        authService.registerUser(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully!");
     }
     
     @PostMapping("/login")
