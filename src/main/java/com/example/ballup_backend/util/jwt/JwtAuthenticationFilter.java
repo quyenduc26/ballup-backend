@@ -1,7 +1,13 @@
 package com.example.ballup_backend.util.jwt;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,7 +23,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.Collections;
 
 @Component
 public class JwtAuthenticationFilter extends HttpFilter {
@@ -37,13 +42,16 @@ public class JwtAuthenticationFilter extends HttpFilter {
             UserDetailProjection userDetails = userService.getAuthenticatedUser(username);
 
             if (userDetails != null) {
-                UserDetails springUser = new User(userDetails.getUsername(), "", Collections.emptyList());
+                GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + userDetails.getRole());
+                UserDetails springUser = new User(userDetails.getUsername(), "", Collections.singletonList(authority));
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(springUser, null, springUser.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+                System.out.println(SecurityContextHolder.getContext().getAuthentication().getAuthorities());
+
             }
         }
         filterChain.doFilter(request, response); 

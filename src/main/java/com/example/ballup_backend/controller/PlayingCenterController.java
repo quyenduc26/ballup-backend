@@ -16,13 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.ballup_backend.dto.req.center.CreateCenterRequest;
 import com.example.ballup_backend.dto.res.center.PlayingCenterResponse;
 import com.example.ballup_backend.dto.res.slot.PlayingSlotResponse;
-import com.example.ballup_backend.entity.PlayingSlotEntity;
 import com.example.ballup_backend.service.PlayingCenterService;
 
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/center")
+@RequestMapping("owner/center")
 public class PlayingCenterController {
 
     @Autowired

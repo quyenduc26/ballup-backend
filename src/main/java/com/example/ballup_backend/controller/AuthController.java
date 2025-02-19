@@ -1,10 +1,13 @@
 package com.example.ballup_backend.controller;
 
-import java.net.URI;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.ballup_backend.dto.req.auth.LoginRequest;
 import com.example.ballup_backend.dto.req.auth.RegisterRequest;
-import com.example.ballup_backend.entity.UserEntity;
 import com.example.ballup_backend.service.AuthService;
 
 import io.jsonwebtoken.io.IOException;
@@ -46,7 +48,22 @@ public class AuthController {
                 + "&response_type=code"
                 + "&scope=email%20profile";
         response.sendRedirect(googleAuthUrl);
-    }   
+    }
+
+    @GetMapping("/test/current-user")
+    public ResponseEntity<?> getCurrentUserRole(Authentication authentication) {
+        if (authentication != null && authentication.getAuthorities() != null) {
+            return ResponseEntity.ok(
+                Map.of(
+                    "username", authentication.getName(),
+                    "authorities", authentication.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .collect(Collectors.toList())
+                )
+            );
+        }
+        return ResponseEntity.ok(Map.of("message", "No authentication found"));
+    }
 
 
     
