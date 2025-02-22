@@ -6,44 +6,40 @@ import java.sql.Timestamp;
 import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
-@Table(name = "slot-availability")
+@Table(name = "unavailable-slot")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SlotAvalabilityEntity {
+public class UnavailableSlotEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "game_id", nullable = false)
-    private GameEntity game;
-
     @Column(name = "start_time", nullable = false)
-    private Timestamp startTime;
+    private Timestamp fromTime;
 
     @Column(name = "return_time", nullable = false)
-    private Timestamp returnTime;
+    private Timestamp toTime;
+
+    @ManyToOne
+    @JoinColumn(name = "playing_slot_id", nullable = false)
+    private PlayingSlotEntity slot ;
 
     @ManyToOne
     @JoinColumn(name = "creator", nullable = false)
     private UserEntity creator;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    private BookingStatus status;
+    @Column(name = "create_by", nullable = false)
+    private createdBy createBy;
 
-    public enum BookingStatus {
-        REQUESTED, CONFIRMED, REJECTED, DEPOSITED, COMPLETED
+    public enum createdBy {
+        BY_USER, BY_OWNER
     }
-
-    @OneToOne
-    @JoinColumn(name = "payment_id", unique = true)
-    private PaymentEntity payment;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

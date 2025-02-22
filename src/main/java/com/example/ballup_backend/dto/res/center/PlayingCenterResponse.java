@@ -17,3 +17,4 @@ public class PlayingCenterResponse {
     String address;
     List<String> imageUrls;
 }
+ 

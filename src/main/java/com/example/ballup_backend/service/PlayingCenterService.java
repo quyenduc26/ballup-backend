@@ -4,6 +4,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.example.ballup_backend.dto.req.center.CreateCenterRequest;
@@ -16,6 +20,7 @@ import com.example.ballup_backend.repository.PlayingCenterImageRepository;
 import com.example.ballup_backend.repository.PlayingCenterRepository;
 import com.example.ballup_backend.repository.PlayingSlotRepository;
 import com.example.ballup_backend.repository.UserRepository;
+import com.example.ballup_backend.specification.PlayingCenterSpecification;
 
 @Service
 public class PlayingCenterService  {
@@ -79,4 +84,17 @@ public class PlayingCenterService  {
 
         return playingSlotRepository.findByPlayingCenter(playingCenter);
     }
+
+
+     public Page<PlayingCenterEntity> searchCenters(String name, String location, Integer minCapacity, Integer maxCapacity, String sortBy, String sortDirection, int page, int size) {
+        Specification<PlayingCenterEntity> spec = Specification
+            .where(PlayingCenterSpecification.filterByName(name))
+            .and(PlayingCenterSpecification.filterByAddress(location));
+
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
+        PageRequest pageable = PageRequest.of(page, size, sort);
+
+        return playingCenterRepository.findAll(spec, pageable);
+
+     }
 }

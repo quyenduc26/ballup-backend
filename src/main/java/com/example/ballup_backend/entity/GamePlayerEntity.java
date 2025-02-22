@@ -2,7 +2,6 @@ package com.example.ballup_backend.entity;import jakarta.persistence.*;
 import lombok.*;
 
 import java.sql.Timestamp;
-import java.time.Instant;
 
 import org.hibernate.annotations.CreationTimestamp;
 
