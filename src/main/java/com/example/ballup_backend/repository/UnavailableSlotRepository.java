@@ -1,5 +1,6 @@
 package com.example.ballup_backend.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,4 +15,7 @@ import com.example.ballup_backend.entity.UnavailableSlotEntity;
 public interface UnavailableSlotRepository extends JpaRepository<UnavailableSlotEntity, Long> {
     @Query("SELECT u FROM UnavailableSlotEntity u JOIN FETCH u.creator WHERE u.slot = :slot")
     List<UnavailableSlotEntity> findBySlot(@Param("slot") PlayingSlotEntity slot);
+
+    @Query("SELECT u.slot FROM UnavailableSlotEntity u WHERE (u.fromTime BETWEEN :fromDateTime AND :toDateTime) OR (u.toTime BETWEEN :fromDateTime AND :toDateTime)")
+    List<Long> findUnavailableSlots(@Param("fromDateTime") LocalDateTime fromDateTime, @Param("toDateTime") LocalDateTime toDateTime);
 }

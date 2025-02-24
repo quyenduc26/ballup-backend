@@ -76,8 +76,7 @@ public class PlayingSlotService {
                 .payment(null)
                 .bookingSlot(unavailableSlot)
                 .build();
-        }
-    
+        }     
     
         return unavailableSlotRepository.save(unavailableSlot);
     }

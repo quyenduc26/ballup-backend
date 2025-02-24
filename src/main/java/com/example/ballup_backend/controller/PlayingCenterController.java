@@ -1,5 +1,8 @@
 package com.example.ballup_backend.controller;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,19 +49,28 @@ public class PlayingCenterController {
         return ResponseEntity.ok(slots);
     }
 
-    @GetMapping("/search")
-        public ResponseEntity<Page<PlayingCenterEntity>> searchPlayingCenters(
-                @RequestParam(required = false) String name,
-                @RequestParam(required = false) String address,
-                @RequestParam(required = false) Integer fromTime,
-                @RequestParam(required = false) Integer toTime,
-                @RequestParam(defaultValue = "id") String sortBy,
-                @RequestParam(defaultValue = "ASC") String sortDirection,
-                @RequestParam(defaultValue = "0") int page,
-                @RequestParam(defaultValue = "10") int size) {
 
-            Page<PlayingCenterEntity> result = playingCenterService.searchCenters(name, address, fromTime, toTime, sortBy, sortDirection, page, size);
-            return ResponseEntity.ok(result);
-        }
+    
+    @GetMapping("/search")
+    public ResponseEntity<Page<PlayingCenterEntity>> searchPlayingCenters(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String address,
+            @RequestParam(required = false) Long fromTime,
+            @RequestParam(required = false) Long toTime,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "ASC") String sortDirection,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        
+        LocalDateTime fromDateTime = fromTime != null ? 
+            LocalDateTime.ofInstant(Instant.ofEpochMilli(fromTime), ZoneId.systemDefault()) : null;
+    
+        LocalDateTime toDateTime = toTime != null ? 
+            LocalDateTime.ofInstant(Instant.ofEpochMilli(toTime), ZoneId.systemDefault()) : null;
+    
+        Page<PlayingCenterEntity> result = playingCenterService.searchCenters(name, address, fromDateTime, toDateTime, sortBy, sortDirection, page, size);
+        return ResponseEntity.ok(result);
+    }
+    
     
 }

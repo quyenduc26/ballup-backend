@@ -1,5 +1,7 @@
 package com.example.ballup_backend.specification;
 
+import java.util.List;
+
 import org.springframework.data.jpa.domain.Specification;
 
 import com.example.ballup_backend.entity.PlayingCenterEntity;
@@ -17,6 +19,11 @@ public class PlayingCenterSpecification {
             if (address == null || address.isEmpty()) return null;
             return criteriaBuilder.equal(criteriaBuilder.lower(root.get("address")), address.toLowerCase());
         };
+    }
+
+    public static Specification<PlayingCenterEntity> excludeCenters(List<Long> excludedCenterIds) {
+        return (root, query, criteriaBuilder) -> 
+            root.get("id").in(excludedCenterIds).not();
     }
 
    
