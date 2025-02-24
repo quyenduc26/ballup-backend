@@ -24,11 +24,11 @@ public class BookingEntity {
     private BookingStatus status;
 
     public enum BookingStatus {
-        REQUESTED, CONFIRMED, REJECTED, DEPOSITED, COMPLETED
+        REQUESTED, CANCEL, CONFIRMED, REJECTED, DEPOSITED, COMPLETED
     }
 
     @OneToOne
-    @JoinColumn(name = "payment_id", unique = true, nullable = false)
+    @JoinColumn(name = "payment_id", unique = true, nullable = true)
     private PaymentEntity payment;
 
     @OneToOne

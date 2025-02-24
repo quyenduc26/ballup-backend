@@ -69,6 +69,27 @@ public class PlayingCenterService {
         return playingCenter;
     }
 
+    public List<PlayingCenterResponse> getCentersByOwnerId(Long ownerId) {
+        UserEntity owner = userRepository.findById(ownerId)
+                .orElseThrow(() -> new RuntimeException("Owner not found"));
+    
+        List<PlayingCenterEntity> centers = playingCenterRepository.findByOwner(owner);
+    
+        return centers.stream().map(center -> {
+            List<String> imageUrls = playingCenterImageRepository.findByCenter(center).stream()
+                    .map(PlayingCenterImageEntity::getImage)
+                    .collect(Collectors.toList());
+    
+            return PlayingCenterResponse.builder()
+                    .name(center.getName())
+                    .description(center.getDescription())
+                    .address(center.getAddress())
+                    .imageUrls(imageUrls)
+                    .build();
+        }).collect(Collectors.toList());
+    }
+    
+
     public PlayingCenterResponse getCenterInfo(Long id) {
         PlayingCenterEntity playingCenter = playingCenterRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Playing center not found"));

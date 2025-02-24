@@ -16,7 +16,9 @@ import com.example.ballup_backend.entity.PlayingCenterEntity;
 import com.example.ballup_backend.entity.PlayingSlotEntity;
 import com.example.ballup_backend.entity.UnavailableSlotEntity;
 import com.example.ballup_backend.entity.UserEntity;
+import com.example.ballup_backend.entity.UserEntity.Role;
 import com.example.ballup_backend.entity.BookingEntity.BookingStatus;
+import com.example.ballup_backend.repository.BookingRepository;
 import com.example.ballup_backend.repository.PlayingCenterRepository;
 import com.example.ballup_backend.repository.PlayingSlotRepository;
 import com.example.ballup_backend.repository.UnavailableSlotRepository;
@@ -33,6 +35,9 @@ public class PlayingSlotService {
 
     @Autowired
     private UnavailableSlotRepository unavailableSlotRepository; 
+
+     @Autowired
+    private BookingRepository bookingRepository;
 
     @Autowired
     private UserRepository userRepository; 
@@ -58,7 +63,7 @@ public class PlayingSlotService {
         UserEntity user = userRepository.findById(request.getUserId())
             .orElseThrow(() -> new RuntimeException("User not found"));
     
-        UnavailableSlotEntity.createdBy createdBy = user.getRole().equals("OWNER") 
+        UnavailableSlotEntity.createdBy createdBy = user.getRole().equals(Role.OWNER) 
             ? UnavailableSlotEntity.createdBy.BY_OWNER 
             : UnavailableSlotEntity.createdBy.BY_USER;
 
@@ -69,16 +74,18 @@ public class PlayingSlotService {
             .creator(user)
             .createBy(createdBy) 
             .build();
+        unavailableSlotRepository.save(unavailableSlot);
 
-        if(user.getRole().equals("USER")){
+        if(user.getRole().equals(Role.USER)){
             BookingEntity bookingEntity = BookingEntity.builder()
                 .status(BookingStatus.REQUESTED)
                 .payment(null)
                 .bookingSlot(unavailableSlot)
                 .build();
+            bookingRepository.save(bookingEntity);
         }     
     
-        return unavailableSlotRepository.save(unavailableSlot);
+        return unavailableSlot;
     }
 
     public List<UnavailableSlotResponse> getDisabledSlots(Long slotId) {
