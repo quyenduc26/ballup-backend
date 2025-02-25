@@ -3,8 +3,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.security.Timestamp;
-import java.time.Instant;
-import java.time.LocalDate;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -42,6 +40,6 @@ public class GameEntity {
 
     @ManyToOne
     @JoinColumn(name = "playing_slot_id", nullable = false)
-    private PlayingSlotEntity field;
+    private PlayingSlotEntity playingSlot;
 }
 

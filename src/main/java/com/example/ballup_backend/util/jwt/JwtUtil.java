@@ -1,7 +1,6 @@
 package com.example.ballup_backend.util.jwt;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Component;
 import java.security.Key;

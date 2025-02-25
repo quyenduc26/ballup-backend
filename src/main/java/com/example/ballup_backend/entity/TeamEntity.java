@@ -1,8 +1,5 @@
 package com.example.ballup_backend.entity;
 
-
-
-import java.security.Timestamp;
 import java.time.Instant;
 
 import org.hibernate.annotations.CreationTimestamp;
