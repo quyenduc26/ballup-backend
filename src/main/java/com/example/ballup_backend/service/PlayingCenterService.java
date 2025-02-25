@@ -14,11 +14,13 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.example.ballup_backend.dto.req.center.CreateCenterRequest;
+import com.example.ballup_backend.dto.res.center.CardPlayingCenterResponse;
 import com.example.ballup_backend.dto.res.center.PlayingCenterResponse;
 import com.example.ballup_backend.entity.PlayingCenterEntity;
 import com.example.ballup_backend.entity.PlayingCenterImageEntity;
 import com.example.ballup_backend.entity.PlayingSlotEntity;
 import com.example.ballup_backend.entity.UserEntity;
+import com.example.ballup_backend.repository.BookingRepository;
 import com.example.ballup_backend.repository.PlayingCenterImageRepository;
 import com.example.ballup_backend.repository.PlayingCenterRepository;
 import com.example.ballup_backend.repository.PlayingSlotRepository;
@@ -43,6 +45,9 @@ public class PlayingCenterService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private BookingRepository bookingRepository;
 
     public PlayingCenterEntity createPlayingCenter(CreateCenterRequest request) {
         UserEntity owner = userRepository.findById(request.getOwnerId())
@@ -115,9 +120,9 @@ public class PlayingCenterService {
 
     
 
-    public Page<PlayingCenterEntity> searchCenters(
-            String name, String location, LocalDateTime fromDateTime, LocalDateTime toDateTime,
-            String sortBy, String sortDirection, int page, int size) {
+    public Page<CardPlayingCenterResponse> getCenterByCriteria(
+        String name, String location, LocalDateTime fromDateTime, LocalDateTime toDateTime,
+        String sortBy, String sortDirection, int page, int size) {
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
         PageRequest pageable = PageRequest.of(page, size, sort);
@@ -155,7 +160,22 @@ public class PlayingCenterService {
             spec = spec.and(PlayingCenterSpecification.filterByAddress(location));
         }
 
-        return playingCenterRepository.findAll(spec, pageable);
+        Page<PlayingCenterEntity> playingCenters = playingCenterRepository.findAll(spec, pageable);
+
+        return playingCenters.map(center -> {
+                PlayingSlotEntity firstSlot = playingSlotRepository.findByPlayingCenter(center).stream().findFirst().orElse(null);
+    
+                return CardPlayingCenterResponse.builder()
+                    .id(center.getId())
+                    .name(center.getName())
+                    .address(center.getAddress())
+                    .type(center.getType())
+                    .bookingCount(bookingRepository.countByPlayingCenter(center))
+                    .primaryPrice(firstSlot != null ? firstSlot.getPrimaryPrice() : null)
+                    .nightPrice(firstSlot != null ? firstSlot.getNightPrice() : null)
+                    .build();
+            });
+        
     }
 
 }
