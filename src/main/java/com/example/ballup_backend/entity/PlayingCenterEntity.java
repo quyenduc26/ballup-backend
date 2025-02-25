@@ -36,4 +36,14 @@ public class PlayingCenterEntity {
 
     @Column(name = "address", length = 256)
     private String address;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false)
+    private PlayingCenterType type;
+
+    public enum PlayingCenterType {
+        FOOTBALL,
+        BADMINTON
+    }
+    
 }

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.ballup_backend.dto.res.center.CardPlayingCenterResponse;
 import com.example.ballup_backend.dto.res.center.PlayingCenterResponse;
 import com.example.ballup_backend.dto.res.slot.PlayingSlotResponse;
 import com.example.ballup_backend.entity.PlayingCenterEntity;
@@ -51,8 +52,8 @@ public class PlayingCenterController {
 
 
     
-    @GetMapping("/search")
-    public ResponseEntity<Page<PlayingCenterEntity>> searchPlayingCenters(
+    @GetMapping
+    public ResponseEntity<Page<CardPlayingCenterResponse>> searchPlayingCenters(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String address,
             @RequestParam(required = false) Long fromTime,
@@ -68,7 +69,7 @@ public class PlayingCenterController {
         LocalDateTime toDateTime = toTime != null ? 
             LocalDateTime.ofInstant(Instant.ofEpochMilli(toTime), ZoneId.systemDefault()) : null;
     
-        Page<PlayingCenterEntity> result = playingCenterService.searchCenters(name, address, fromDateTime, toDateTime, sortBy, sortDirection, page, size);
+        Page<CardPlayingCenterResponse> result = playingCenterService.getCenterByCriteria(name, address, fromDateTime, toDateTime, sortBy, sortDirection, page, size);
         return ResponseEntity.ok(result);
     }
     

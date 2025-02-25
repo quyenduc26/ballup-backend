@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import com.example.ballup_backend.entity.BookingEntity;
 import com.example.ballup_backend.entity.BookingEntity.BookingStatus;
+import com.example.ballup_backend.entity.PlayingCenterEntity;
 
 @Repository
 public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
@@ -22,4 +23,7 @@ public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
         @Param("status") BookingStatus status, 
         @Param("unavailableSlotIds") List<Long> unavailableSlotIds
     );
+
+    @Query("SELECT COUNT(b) FROM BookingEntity b WHERE b.bookingSlot.slot.playingCenter = :center")
+    Long countByPlayingCenter(PlayingCenterEntity center);
 }
