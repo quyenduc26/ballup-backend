@@ -113,6 +113,8 @@ public class PlayingCenterService {
         return playingSlotRepository.findByPlayingCenter(playingCenter);
     }
 
+    
+
     public Page<PlayingCenterEntity> searchCenters(
             String name, String location, LocalDateTime fromDateTime, LocalDateTime toDateTime,
             String sortBy, String sortDirection, int page, int size) {

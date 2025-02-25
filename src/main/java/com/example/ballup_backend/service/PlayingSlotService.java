@@ -1,7 +1,6 @@
 package com.example.ballup_backend.service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,6 @@ import com.example.ballup_backend.dto.req.slot.CreateSlotRequest;
 import com.example.ballup_backend.dto.req.slot.DisableSlotRequest;
 import com.example.ballup_backend.dto.res.slot.UnavailableSlotResponse;
 import com.example.ballup_backend.entity.BookingEntity;
-import com.example.ballup_backend.entity.PaymentEntity;
 import com.example.ballup_backend.entity.PlayingCenterEntity;
 import com.example.ballup_backend.entity.PlayingSlotEntity;
 import com.example.ballup_backend.entity.UnavailableSlotEntity;

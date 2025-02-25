@@ -18,4 +18,8 @@ public interface UnavailableSlotRepository extends JpaRepository<UnavailableSlot
 
     @Query("SELECT u.slot FROM UnavailableSlotEntity u WHERE (u.fromTime BETWEEN :fromDateTime AND :toDateTime) OR (u.toTime BETWEEN :fromDateTime AND :toDateTime)")
     List<Long> findUnavailableSlots(@Param("fromDateTime") LocalDateTime fromDateTime, @Param("toDateTime") LocalDateTime toDateTime);
+
+    @Query("SELECT u.id FROM UnavailableSlotEntity u WHERE u.slot.id IN :slotIds AND u.createBy = 'BY_USER'")
+    List<Long> findBySlotIdAndCreatedByUser(@Param("slotIds") List<Long> slotIds);
+
 }

@@ -15,9 +15,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.ballup_backend.dto.req.center.CreateCenterRequest;
+import com.example.ballup_backend.dto.req.owner.BookingRequestResponse;
 import com.example.ballup_backend.dto.req.slot.CreateSlotRequest;
 import com.example.ballup_backend.dto.req.slot.DisableSlotRequest;
 import com.example.ballup_backend.dto.res.center.PlayingCenterResponse;
+import com.example.ballup_backend.entity.BookingEntity;
 import com.example.ballup_backend.service.BookingService;
 import com.example.ballup_backend.service.PlayingCenterService;
 import com.example.ballup_backend.service.PlayingSlotService;
@@ -83,4 +85,11 @@ public class CourtOwnerController {
         bookingService.rejectBookingRequest(bookingId);
         return ResponseEntity.ok("Booking deposited successfully");
     }
+
+   @GetMapping("booking/requests/{ownerId}")
+    public ResponseEntity<List<BookingRequestResponse>> getRequestBooking(@PathVariable Long ownerId) {
+        List<BookingRequestResponse> bookingRequests = bookingService.getAllBookingRequests(ownerId);
+        return ResponseEntity.ok(bookingRequests);
+    }
+
 }
