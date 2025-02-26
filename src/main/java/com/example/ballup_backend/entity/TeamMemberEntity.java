@@ -1,4 +1,6 @@
-package com.example.ballup_backend.entity;import java.security.Timestamp;
+package com.example.ballup_backend.entity;
+
+import java.sql.Timestamp;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -30,4 +32,12 @@ public class TeamMemberEntity {
     @Column(name = "created_at", nullable = false)
     @CreationTimestamp
     private Timestamp createdAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private Role role;  
+
+    public enum Role {
+        OWNER, MEMBER
+    }
 }

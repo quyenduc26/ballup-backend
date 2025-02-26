@@ -1,0 +1,41 @@
+package com.example.ballup_backend.service;
+
+import com.example.ballup_backend.entity.TeamEntity;
+import com.example.ballup_backend.entity.TeamMemberEntity;
+import com.example.ballup_backend.entity.UserEntity;
+import com.example.ballup_backend.entity.TeamMemberEntity.Role;
+import com.example.ballup_backend.repository.TeamRepository;
+import com.example.ballup_backend.repository.UserRepository;
+import com.example.ballup_backend.repository.TeamMemberRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+
+@Service
+public class TeamMemberService {
+    @Autowired
+    private TeamRepository teamRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private TeamMemberRepository teamMemberRepository;
+
+
+    public TeamMemberEntity createTeamMember(Long userId, Long teamId, Role role) {
+        UserEntity user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        TeamEntity team = teamRepository.findById(teamId)
+        .orElseThrow(() -> new RuntimeException("Team not found"));;
+
+        TeamMemberEntity teamMember = TeamMemberEntity.builder()
+                .user(user)
+                .team(team)
+                .role(role)
+                .build();
+
+        return teamMemberRepository.save(teamMember);
+    }
+}
