@@ -58,6 +58,7 @@ public class PlayingCenterService {
                 .description(request.getDescription())
                 .address(request.getAddress())
                 .owner(owner)
+                .type(request.getCenterType())
                 .build();
         PlayingCenterEntity savedCenter = playingCenterRepository.save(playingCenter);
 

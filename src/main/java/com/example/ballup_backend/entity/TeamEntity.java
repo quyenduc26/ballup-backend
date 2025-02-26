@@ -19,7 +19,7 @@ public class TeamEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long teamId;
+    private Long id;
 
     @Column(name = "name", length = 256, nullable = false)
     private String name;
@@ -34,16 +34,20 @@ public class TeamEntity {
     @Column(name = "intro", length = 256)
     private String intro;
 
-    @Column(name = "avatar", length = 256)
-    private String avatar;
+    @Column(name = "logo", length = 256)
+    private String logo;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false)
-    private Sport sport;
+    @Column(name = "cover", length = 256)
+    private String cover;
 
     @ManyToOne
     @JoinColumn(name = "conversation_id")
     private ConversationEntity conversation;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false)
+    private Sport sport;
+
 
     public enum Sport {
         FOOTBALL, BADMINTON

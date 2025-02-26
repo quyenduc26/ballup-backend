@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.ballup_backend.dto.res.center.CardPlayingCenterResponse;
 import com.example.ballup_backend.dto.res.center.PlayingCenterResponse;
 import com.example.ballup_backend.dto.res.slot.PlayingSlotResponse;
-import com.example.ballup_backend.entity.PlayingCenterEntity;
 import com.example.ballup_backend.service.PlayingCenterService;
 
 

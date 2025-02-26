@@ -2,6 +2,8 @@ package com.example.ballup_backend.dto.req.center;
 
 import java.util.List;
 
+import com.example.ballup_backend.entity.PlayingCenterEntity.PlayingCenterType;
+
 import jakarta.validation.constraints.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,4 +31,6 @@ public class CreateCenterRequest {
 
     @NotEmpty 
     private List<String> images;
+
+    private PlayingCenterType centerType;
 }
