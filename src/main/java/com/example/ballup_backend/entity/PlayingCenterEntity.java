@@ -42,8 +42,7 @@ public class PlayingCenterEntity {
     private PlayingCenterType type;
 
     public enum PlayingCenterType {
-        FOOTBALL,
-        BADMINTON
+        FOOTBALL,BADMINTON
     }
     
 }
