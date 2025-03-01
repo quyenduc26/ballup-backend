@@ -23,9 +23,6 @@ public class GameEntity {
     @Column(name = "time", nullable = false)
     private Timestamp time; 
 
-    @Column(name = "date", nullable = false)
-    private Timestamp date;
-
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt;

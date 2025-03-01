@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.ballup_backend.dto.req.slot.CreateSlotRequest;
 import com.example.ballup_backend.dto.req.slot.DisableSlotRequest;
+import com.example.ballup_backend.dto.req.slot.UpdateSlotRequest;
 import com.example.ballup_backend.dto.res.slot.UnavailableSlotResponse;
 import com.example.ballup_backend.entity.BookingEntity;
 import com.example.ballup_backend.entity.PlayingCenterEntity;
@@ -21,6 +22,9 @@ import com.example.ballup_backend.repository.PlayingCenterRepository;
 import com.example.ballup_backend.repository.PlayingSlotRepository;
 import com.example.ballup_backend.repository.UnavailableSlotRepository;
 import com.example.ballup_backend.repository.UserRepository;
+
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 
 @Service
 public class PlayingSlotService {
@@ -105,5 +109,21 @@ public class PlayingSlotService {
 
         return unavailableSlotsResponses;
 
+    }
+
+    @Transactional
+    public void updatePlayingSlot(Long id, UpdateSlotRequest request) {
+        PlayingSlotEntity existingSlot = playingSlotRepository.getReferenceById(id);
+
+        if (request.getName() != null) {
+            existingSlot.setName(request.getName());
+        }
+        if (request.getPrimaryPrice() != null) {
+            existingSlot.setPrimaryPrice(request.getPrimaryPrice());
+        }
+        if (request.getNightPrice() != null) {
+            existingSlot.setNightPrice(request.getNightPrice());
+        }
+        playingSlotRepository.save(existingSlot);
     }
 }

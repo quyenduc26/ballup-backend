@@ -1,6 +1,6 @@
 package com.example.ballup_backend.entity;
 
-import java.time.Instant;
+import java.sql.Timestamp;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -26,7 +26,7 @@ public class TeamEntity {
 
     @Column(name = "created_at", nullable = false)
     @CreationTimestamp
-    private Instant createdAt;
+    private Timestamp createdAt;
 
     @Column(name = "address", length = 256)
     private String address;

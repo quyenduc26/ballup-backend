@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
-@Table(name = "match_Player")
+@Table(name = "game-player")
 @Getter
 @Setter
 @NoArgsConstructor

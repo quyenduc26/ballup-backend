@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.example.ballup_backend.dto.req.center.CreateCenterRequest;
+import com.example.ballup_backend.dto.req.center.UpdateCenterRequest;
 import com.example.ballup_backend.dto.res.center.CardPlayingCenterResponse;
 import com.example.ballup_backend.dto.res.center.PlayingCenterResponse;
 import com.example.ballup_backend.entity.PlayingCenterEntity;
@@ -27,6 +29,8 @@ import com.example.ballup_backend.repository.PlayingSlotRepository;
 import com.example.ballup_backend.repository.UnavailableSlotRepository;
 import com.example.ballup_backend.repository.UserRepository;
 import com.example.ballup_backend.specification.PlayingCenterSpecification;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class PlayingCenterService {
@@ -178,5 +182,37 @@ public class PlayingCenterService {
             });
         
     }
+
+        @Transactional
+        public void updatePlayingCenter(Long id, UpdateCenterRequest updatedCenter) {
+        PlayingCenterEntity existingCenter = playingCenterRepository.getReferenceById(id);
+
+        if (updatedCenter.getName() != null) {
+                existingCenter.setName(updatedCenter.getName());
+        }
+        if (updatedCenter.getDescription() != null) {
+                existingCenter.setDescription(updatedCenter.getDescription());
+        }
+        if (updatedCenter.getAddress() != null) {
+                existingCenter.setAddress(updatedCenter.getAddress());
+        }
+        if (updatedCenter.getType() != null) {
+                existingCenter.setType(updatedCenter.getType());
+        }
+
+        if (updatedCenter.getImages() != null && !updatedCenter.getImages().isEmpty()) {
+                playingCenterImageRepository.deleteByPlayingCenter(existingCenter);
+        
+                List<PlayingCenterImageEntity> images = updatedCenter.getImages().stream()
+                        .map(image -> PlayingCenterImageEntity.builder()
+                                .center(existingCenter)
+                                .image(image)
+                                .build())
+                        .collect(Collectors.toList());
+        
+                playingCenterImageRepository.saveAll(images);
+            }
+        }
+
 
 }
