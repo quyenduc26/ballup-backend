@@ -1,7 +1,11 @@
 package com.example.ballup_backend.controller;
 
 import com.example.ballup_backend.dto.req.team.CreateTeamRequest;
+import com.example.ballup_backend.dto.res.team.TeamResponse;
+import com.example.ballup_backend.entity.TeamEntity;
 import com.example.ballup_backend.service.TeamService;
+
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,11 +22,23 @@ public class TeamController {
         this.teamService = teamService;
     }
 
+    @GetMapping
+    public ResponseEntity<List<TeamResponse>> getAllTeams(
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "location", required = false) String location,
+            @RequestParam(value = "sport", required = false) TeamEntity.Sport sport,
+            @RequestParam(value = "sortBy", required = false) String sortBy) {
+
+        List<TeamResponse> teams = teamService.getAllTeams(name, location, sport, sortBy);
+        return ResponseEntity.ok(teams);
+    }
+
     @PostMapping("/create")
     public ResponseEntity<String> createTeam(@RequestBody CreateTeamRequest request) {
-        String team = teamService.createTeam(request);
+        teamService.createTeam(request);
         return ResponseEntity.ok("Team created successfully!");
     }
+
 
     @PostMapping("/join")
     public ResponseEntity<String> joinTeam(@RequestParam Long userId, @RequestParam Long teamId) {

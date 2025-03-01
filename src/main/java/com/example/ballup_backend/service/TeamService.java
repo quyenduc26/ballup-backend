@@ -1,18 +1,25 @@
 package com.example.ballup_backend.service;
 
 import com.example.ballup_backend.dto.req.team.CreateTeamRequest;
+import com.example.ballup_backend.dto.res.team.TeamResponse;
 import com.example.ballup_backend.entity.TeamEntity;
 import com.example.ballup_backend.entity.TeamMemberEntity;
 import com.example.ballup_backend.entity.UserEntity;
 import com.example.ballup_backend.entity.TeamMemberEntity.Role;
 import com.example.ballup_backend.repository.TeamRepository;
 import com.example.ballup_backend.repository.UserRepository;
+import com.example.ballup_backend.specification.TeamSpecification;
 
 import jakarta.transaction.Transactional;
 
 import com.example.ballup_backend.repository.TeamMemberRepository;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 
@@ -31,7 +38,7 @@ public class TeamService {
     private TeamMemberService teamMemberService;
 
     @Transactional
-    public String createTeam(CreateTeamRequest request) {
+    public void createTeam(CreateTeamRequest request) {
         TeamEntity team = TeamEntity.builder()
             .name(request.getName())
             .address(request.getAddress())
@@ -45,7 +52,6 @@ public class TeamService {
             .orElseThrow(() -> new RuntimeException("User not found"));
         
         teamMemberService.createTeamMember(user.getId(), savedTeam.getId(), Role.OWNER);
-        return "Create team successfully";
     }
 
     public String joinTeam(Long userId, Long teamId) {
@@ -58,8 +64,42 @@ public class TeamService {
             .user(user)
             .build();
         teamMemberRepository.save(teamMember);
-
         return "User " + user.getUsername() + " joined team " + team.getName();
     }
+
+    public List<TeamResponse> getAllTeams(String name, String location, TeamEntity.Sport sport, String sortBy) {
+        Specification<TeamEntity> spec = Specification.where(null);
+
+        if (name != null && !name.isEmpty()) {
+            spec = spec.and(TeamSpecification.filterByName(name));
+        }
+        if (location != null && !location.isEmpty()) {
+            spec = spec.and(TeamSpecification.filterByLocation(location));
+        }
+        if (sport != null) {
+            spec = spec.and(TeamSpecification.filterBySport(sport));
+        }
+
+        List<TeamEntity> teams = teamRepository.findAll(spec);
+
+        List<TeamResponse> teamResponses = teams.stream().map(team -> {
+            Long totalMembers = teamMemberRepository.countByTeamId(team.getId());
+            return TeamResponse.builder()
+                    .name(team.getName())
+                    .address(team.getAddress())
+                    .intro(team.getIntro())
+                    .logo(team.getLogo())
+                    .cover(team.getCover())
+                    .sport(team.getSport())
+                    .totalMembers(totalMembers)
+                    .build();
+        }).collect(Collectors.toList());
+
+        teamResponses.sort(Comparator.comparingLong((TeamResponse team) -> team.getTotalMembers() == null ? 0L : team.getTotalMembers()).reversed());
+
+        return teamResponses;
+    }
+
+    
 
 }
