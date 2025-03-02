@@ -41,6 +41,12 @@ public class UserEntity {
     @Column(name = "avatar", nullable = true, length = 255 )
     private String avatar;
 
+    @Column(name = "weight", nullable = true)
+    private Integer weight;
+
+    @Column(name = "height", nullable = true)
+    private Integer height;
+
     @Builder.Default
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted = false;

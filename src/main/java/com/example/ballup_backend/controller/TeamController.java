@@ -1,6 +1,7 @@
 package com.example.ballup_backend.controller;
 
 import com.example.ballup_backend.dto.req.team.CreateTeamRequest;
+import com.example.ballup_backend.dto.res.team.TeamDetailResponse;
 import com.example.ballup_backend.dto.res.team.TeamResponse;
 import com.example.ballup_backend.entity.TeamEntity;
 import com.example.ballup_backend.service.TeamService;
@@ -31,6 +32,11 @@ public class TeamController {
 
         List<TeamResponse> teams = teamService.getAllTeams(name, location, sport, sortBy);
         return ResponseEntity.ok(teams);
+    }
+
+    @GetMapping("/{teamId}")
+    public ResponseEntity<TeamDetailResponse> getTeamDetail(@PathVariable Long teamId) {
+        return ResponseEntity.ok(teamService.getTeamById(teamId));
     }
 
     @PostMapping("/create")
