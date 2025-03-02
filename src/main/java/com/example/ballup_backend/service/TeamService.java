@@ -103,7 +103,7 @@ public class TeamService {
         return teamResponses;
     }
 
-    public TeamDetailResponse getTeamById(Long teamId) {
+    public TeamDetailResponse getTeamById(Long teamId, Long userId) {
         TeamEntity team = teamRepository.findById(teamId)
             .orElseThrow(() -> new RuntimeException("Team not found"));
     
@@ -119,6 +119,11 @@ public class TeamService {
                 .weight(teamMember.getWeight())
                 .build())
             .collect(Collectors.toList());
+
+        Long ownerId = teamMemberRepository.findOwnerByTeamId(teamId)
+            .orElse(null); // Trả về null nếu không có owner nào
+    
+        boolean isOwner = ownerId != null && ownerId.equals(userId);
     
         return TeamDetailResponse.builder()
                 .id(team.getId())
@@ -129,6 +134,7 @@ public class TeamService {
                 .cover(team.getCover())
                 .sport(team.getSport())
                 .members(memberResponses) 
+                .isOwner(isOwner)
                 .build();
     }
     

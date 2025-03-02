@@ -34,9 +34,9 @@ public class TeamController {
         return ResponseEntity.ok(teams);
     }
 
-    @GetMapping("/{teamId}")
-    public ResponseEntity<TeamDetailResponse> getTeamDetail(@PathVariable Long teamId) {
-        return ResponseEntity.ok(teamService.getTeamById(teamId));
+    @GetMapping("/{teamId}/user/{userId}")
+    public ResponseEntity<TeamDetailResponse> getTeamDetail(@PathVariable Long teamId, @PathVariable Long userId) {
+        return ResponseEntity.ok(teamService.getTeamById(teamId, userId));
     }
 
     @PostMapping("/create")
