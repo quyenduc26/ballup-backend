@@ -48,11 +48,8 @@ public class AuthService {
     }
 
     public String loginUser(LoginRequest request) {
-        userRepository.findByEmail(request.getEmailOrUsername())
-            .orElseThrow(() -> new BaseException(ErrorCodeEnum.INVALID_EMAIL_OR_USERNAME, HttpStatus.NOT_FOUND ));
-
         UserEntity user = userRepository.findByUsernameOrEmail(request.getEmailOrUsername(),request.getEmailOrUsername() )
-            .orElseThrow(() -> new BaseException(ErrorCodeEnum.USER_NOT_FOUND, HttpStatus.NOT_FOUND ));
+            .orElseThrow(() -> new BaseException(ErrorCodeEnum.INVALID_EMAIL_OR_USERNAME, HttpStatus.NOT_FOUND ));
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new BaseException(ErrorCodeEnum.INCORRECT_PASSWORD, HttpStatus.UNAUTHORIZED);
         }
