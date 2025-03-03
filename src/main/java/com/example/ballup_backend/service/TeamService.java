@@ -1,6 +1,9 @@
 package com.example.ballup_backend.service;
 
 import com.example.ballup_backend.dto.req.team.CreateTeamRequest;
+import com.example.ballup_backend.dto.req.team.UpdateTeamRequest;
+import com.example.ballup_backend.dto.res.team.TeamDetailResponse;
+import com.example.ballup_backend.dto.res.team.TeamMemberResponse;
 import com.example.ballup_backend.dto.res.team.TeamResponse;
 import com.example.ballup_backend.entity.TeamEntity;
 import com.example.ballup_backend.entity.TeamMemberEntity;
@@ -85,6 +88,7 @@ public class TeamService {
         List<TeamResponse> teamResponses = teams.stream().map(team -> {
             Long totalMembers = teamMemberRepository.countByTeamId(team.getId());
             return TeamResponse.builder()
+                    .id(team.getId())
                     .name(team.getName())
                     .address(team.getAddress())
                     .intro(team.getIntro())
@@ -100,6 +104,53 @@ public class TeamService {
         return teamResponses;
     }
 
+    public TeamDetailResponse getTeamById(Long teamId, Long userId) {
+        TeamEntity team = teamRepository.findById(teamId)
+            .orElseThrow(() -> new RuntimeException("Team not found"));
     
+        List<UserEntity> teamMembers = teamMemberRepository.findUsersByTeamId(teamId);
+    
+        List<TeamMemberResponse> memberResponses = teamMembers.stream()
+            .map(teamMember -> TeamMemberResponse.builder()
+                .id(teamMember.getId())
+                .name(teamMember.getLastName().concat(" " +teamMember.getFirstName()))
+                .username(teamMember.getUsername())
+                .avatar(teamMember.getAvatar())
+                .height(teamMember.getHeight())
+                .weight(teamMember.getWeight())
+                .build())
+            .collect(Collectors.toList());
+
+        Long ownerId = teamMemberRepository.findOwnerByTeamId(teamId)
+            .orElse(null); // Trả về null nếu không có owner nào
+    
+        boolean isOwner = ownerId != null && ownerId.equals(userId);
+    
+        return TeamDetailResponse.builder()
+                .id(team.getId())
+                .name(team.getName())
+                .address(team.getAddress())
+                .intro(team.getIntro())
+                .logo(team.getLogo())
+                .cover(team.getCover())
+                .sport(team.getSport())
+                .members(memberResponses) 
+                .isOwner(isOwner)
+                .build();
+    }
+    
+    @Transactional
+    public void updateTeam(Long teamId, UpdateTeamRequest request) {
+        TeamEntity team = teamRepository.getReferenceById(teamId); 
+
+        if (request.getName() != null) team.setName(request.getName());
+        if (request.getAddress() != null) team.setAddress(request.getAddress());
+        if (request.getIntro() != null) team.setIntro(request.getIntro());
+        if (request.getLogo() != null) team.setLogo(request.getLogo());
+        if (request.getCover() != null) team.setCover(request.getCover());
+
+        teamRepository.save(team);
+    }
+
 
 }

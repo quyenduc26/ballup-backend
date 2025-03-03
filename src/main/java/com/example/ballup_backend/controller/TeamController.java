@@ -1,6 +1,8 @@
 package com.example.ballup_backend.controller;
 
 import com.example.ballup_backend.dto.req.team.CreateTeamRequest;
+import com.example.ballup_backend.dto.req.team.UpdateTeamRequest;
+import com.example.ballup_backend.dto.res.team.TeamDetailResponse;
 import com.example.ballup_backend.dto.res.team.TeamResponse;
 import com.example.ballup_backend.entity.TeamEntity;
 import com.example.ballup_backend.service.TeamService;
@@ -33,6 +35,11 @@ public class TeamController {
         return ResponseEntity.ok(teams);
     }
 
+    @GetMapping("/{teamId}/user/{userId}")
+    public ResponseEntity<TeamDetailResponse> getTeamDetail(@PathVariable Long teamId, @PathVariable Long userId) {
+        return ResponseEntity.ok(teamService.getTeamById(teamId, userId));
+    }
+
     @PostMapping("/create")
     public ResponseEntity<String> createTeam(@RequestBody CreateTeamRequest request) {
         teamService.createTeam(request);
@@ -44,5 +51,11 @@ public class TeamController {
     public ResponseEntity<String> joinTeam(@RequestParam Long userId, @RequestParam Long teamId) {
         String response = teamService.joinTeam(userId, teamId);
         return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{teamId}")
+    public ResponseEntity<String> updateTeam( @PathVariable Long teamId, @RequestBody UpdateTeamRequest request) {
+        teamService.updateTeam(teamId, request);
+        return ResponseEntity.ok("Team updated successfully");
     }
 }

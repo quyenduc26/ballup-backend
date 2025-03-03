@@ -1,5 +1,7 @@
 package com.example.ballup_backend.dto.res.team;
 
+import java.util.List;
+
 import com.example.ballup_backend.entity.TeamEntity;
 
 import lombok.Builder;
@@ -9,7 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class TeamResponse {
+public class TeamDetailResponse {
     private Long id;
     private String name;
     private String address;
@@ -17,5 +19,6 @@ public class TeamResponse {
     private String logo;
     private String cover;
     private TeamEntity.Sport sport;
-    private Long totalMembers;
+    private boolean isOwner;
+    private List<TeamMemberResponse> members;
 }
