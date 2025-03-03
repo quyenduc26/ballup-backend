@@ -168,6 +168,7 @@ public class PlayingCenterService {
 
         return playingCenters.map(center -> {
                 PlayingSlotEntity firstSlot = playingSlotRepository.findByPlayingCenter(center).stream().findFirst().orElse(null);
+                String image = playingCenterImageRepository.findByCenter(center).get(0).getImage();
     
                 return CardPlayingCenterResponse.builder()
                     .id(center.getId())
@@ -177,6 +178,7 @@ public class PlayingCenterService {
                     .bookingCount(bookingRepository.countByPlayingCenter(center))
                     .primaryPrice(firstSlot != null ? firstSlot.getPrimaryPrice() : null)
                     .nightPrice(firstSlot != null ? firstSlot.getNightPrice() : null)
+                    .image(image)
                     .build();
             });
         
