@@ -40,4 +40,12 @@ public class TeamMemberController {
         teamMemberService.kickMember(kickTeamMemberRequest, memberId);
         return ResponseEntity.ok("Member kicked successfully");
     }
+
+    @DeleteMapping("/{teamId}/leave")
+    public ResponseEntity<String> kickMember(@PathVariable Long teamId, @RequestParam Long memberId) {
+        teamMemberService.leaveTeam(teamId, memberId);
+        return ResponseEntity.ok("Member kicked successfully");
+    }
+
+
 }

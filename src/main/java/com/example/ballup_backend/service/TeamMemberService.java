@@ -83,4 +83,10 @@ public class TeamMemberService {
         teamMemberRepository.delete(memberToKick);
     }
 
+    public void leaveTeam(Long teamId, Long memberId) {
+        TeamMemberEntity memberToLeave = teamMemberRepository.findByTeamIdAndMemberId(teamId, memberId)
+            .orElseThrow(() -> new BaseException(ErrorCodeEnum.USER_NOT_IN_TEAM, HttpStatus.BAD_REQUEST));
+        teamMemberRepository.delete(memberToLeave);
+    }
+    
 }
