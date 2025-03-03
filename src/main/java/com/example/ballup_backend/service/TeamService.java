@@ -1,6 +1,7 @@
 package com.example.ballup_backend.service;
 
 import com.example.ballup_backend.dto.req.team.CreateTeamRequest;
+import com.example.ballup_backend.dto.req.team.UpdateTeamRequest;
 import com.example.ballup_backend.dto.res.team.TeamDetailResponse;
 import com.example.ballup_backend.dto.res.team.TeamMemberResponse;
 import com.example.ballup_backend.dto.res.team.TeamResponse;
@@ -138,6 +139,18 @@ public class TeamService {
                 .build();
     }
     
-    
+    @Transactional
+    public void updateTeam(Long teamId, UpdateTeamRequest request) {
+        TeamEntity team = teamRepository.getReferenceById(teamId); 
+
+        if (request.getName() != null) team.setName(request.getName());
+        if (request.getAddress() != null) team.setAddress(request.getAddress());
+        if (request.getIntro() != null) team.setIntro(request.getIntro());
+        if (request.getLogo() != null) team.setLogo(request.getLogo());
+        if (request.getCover() != null) team.setCover(request.getCover());
+
+        teamRepository.save(team);
+    }
+
 
 }

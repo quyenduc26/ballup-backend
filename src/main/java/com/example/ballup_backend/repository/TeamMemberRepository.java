@@ -20,6 +20,10 @@ public interface TeamMemberRepository extends JpaRepository<TeamMemberEntity, Lo
     @Query("SELECT tm.user.id FROM TeamMemberEntity tm WHERE tm.team.id = :teamId AND tm.role = 'owner'")
     Optional<Long> findOwnerByTeamId(@Param("teamId") Long teamId);
 
+    @Query("SELECT tm FROM TeamMemberEntity tm WHERE tm.team.id = :teamId AND tm.user.id = :memberId")
+    Optional<TeamMemberEntity> findByTeamIdAndMemberId(@Param("teamId") Long teamId, @Param("memberId") Long memberId);
+
+
     
 }
 

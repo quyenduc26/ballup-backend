@@ -11,7 +11,8 @@ public enum ErrorCodeEnum {
     INTERNAL_ERROR(1003, "Internal server error"),
     DATA_NOT_FOUND(1004, "The requested URL was not found on this server."),
     USER_ALREADY_EXITS(1005, "User already exits"),
-    INCORRECT_PASSWORD(1006, "Incorrect password");
+    INCORRECT_PASSWORD(1006, "Incorrect password"),
+    INVALID_EMAIL_OR_USERNAME(1007, "Invalid email or username");
 
     private final int code;
     private final String message;
