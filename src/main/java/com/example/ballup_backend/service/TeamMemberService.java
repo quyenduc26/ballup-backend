@@ -49,14 +49,11 @@ public class TeamMemberService {
 
     @Transactional
     public void updateTeamMemberRole(Long memberId, UpdateMemberRoleRequest updateMemberRoleRequest) {
-        System.out.println(updateMemberRoleRequest.getTeamId() + "" + memberId + "" + memberId);
-
         TeamMemberEntity owner = teamMemberRepository.findByTeamIdAndMemberId(updateMemberRoleRequest.getTeamId(), updateMemberRoleRequest.getUserId())
             .orElseThrow(() -> new RuntimeException("Member does not belong to the specified team."));
         if (!owner.getRole().equals(Role.OWNER)) {
             throw new RuntimeException("Only the team owner can update member roles.");
         }
-        System.out.println(updateMemberRoleRequest.getTeamId() + "" + memberId);
 
         TeamMemberEntity teamMember = teamMemberRepository.findByTeamIdAndMemberId(updateMemberRoleRequest.getTeamId(), memberId)
             .orElseThrow(() -> new RuntimeException("Member does not belong to the specified team."));
@@ -89,4 +86,8 @@ public class TeamMemberService {
         teamMemberRepository.delete(memberToLeave);
     }
     
+    @Transactional
+    public void deleteByTeamId(Long teamId) {
+        teamMemberRepository.deleteByTeamId(teamId);
+    }
 }

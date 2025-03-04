@@ -1,6 +1,8 @@
 package com.example.ballup_backend.entity;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -52,5 +54,6 @@ public class TeamEntity {
     public enum Sport {
         FOOTBALL, BADMINTON
     }
+
     
 }

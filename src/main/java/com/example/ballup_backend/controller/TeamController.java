@@ -58,4 +58,10 @@ public class TeamController {
         teamService.updateTeam(teamId, request);
         return ResponseEntity.ok("Team updated successfully");
     }
+
+    @DeleteMapping("/{teamId}")
+    public ResponseEntity<String> updateTeam( @PathVariable Long teamId, @RequestParam Long userId) {
+        teamService.deleteTeam(teamId, userId);
+        return ResponseEntity.ok("Team deleted successfully");
+    }
 }
