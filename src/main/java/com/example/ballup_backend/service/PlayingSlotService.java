@@ -23,7 +23,6 @@ import com.example.ballup_backend.repository.PlayingSlotRepository;
 import com.example.ballup_backend.repository.UnavailableSlotRepository;
 import com.example.ballup_backend.repository.UserRepository;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
 @Service

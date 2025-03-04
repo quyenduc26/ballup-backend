@@ -17,6 +17,7 @@ import com.example.ballup_backend.dto.req.center.CreateCenterRequest;
 import com.example.ballup_backend.dto.req.center.UpdateCenterRequest;
 import com.example.ballup_backend.dto.res.center.CardPlayingCenterResponse;
 import com.example.ballup_backend.dto.res.center.PlayingCenterResponse;
+import com.example.ballup_backend.dto.res.slot.PlayingSlotResponse;
 import com.example.ballup_backend.entity.PlayingCenterEntity;
 import com.example.ballup_backend.entity.PlayingCenterImageEntity;
 import com.example.ballup_backend.entity.PlayingSlotEntity;
@@ -88,13 +89,24 @@ public class PlayingCenterService {
             List<String> imageUrls = playingCenterImageRepository.findByCenter(center).stream()
                     .map(PlayingCenterImageEntity::getImage)
                     .collect(Collectors.toList());
+        List<PlayingSlotResponse> slotResponses = playingSlotRepository.findSlotsByCenter(center).stream()
+        .map(slot -> PlayingSlotResponse.builder()
+                .id(slot.getId())
+                .name(slot.getName())
+                .primaryPrice(slot.getPrimaryPrice())
+                .nightPrice(slot.getNightPrice())
+                .build())
+        .collect(Collectors.toList());
+
     
             return PlayingCenterResponse.builder()
-                    .name(center.getName())
-                    .description(center.getDescription())
-                    .address(center.getAddress())
-                    .imageUrls(imageUrls)
-                    .build();
+                .id(center.getId())
+                .name(center.getName())
+                .description(center.getDescription())
+                .address(center.getAddress())
+                .imageUrls(imageUrls)
+                .slots(slotResponses)
+                .build();
         }).collect(Collectors.toList());
     }
     

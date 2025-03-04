@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.ballup_backend.dto.req.auth.LoginRequest;
 import com.example.ballup_backend.dto.req.auth.RegisterRequest;
+import com.example.ballup_backend.dto.res.user.LoginResponse;
 import com.example.ballup_backend.entity.UserEntity;
 import com.example.ballup_backend.entity.UserEntity.Role;
 import com.example.ballup_backend.exception.BaseException;
@@ -47,15 +48,26 @@ public class AuthService {
         return userRepository.save(user); 
     }
 
-    public String loginUser(LoginRequest request) {
-        UserEntity user = userRepository.findByUsernameOrEmail(request.getEmailOrUsername(),request.getEmailOrUsername() )
-            .orElseThrow(() -> new BaseException(ErrorCodeEnum.INVALID_EMAIL_OR_USERNAME, HttpStatus.NOT_FOUND ));
+    public LoginResponse loginUser(LoginRequest request) {
+        UserEntity user = userRepository.findByUsernameOrEmail(request.getEmailOrUsername(), request.getEmailOrUsername())
+            .orElseThrow(() -> new BaseException(ErrorCodeEnum.INVALID_EMAIL_OR_USERNAME, HttpStatus.NOT_FOUND));
+    
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new BaseException(ErrorCodeEnum.INCORRECT_PASSWORD, HttpStatus.UNAUTHORIZED);
         }
-
-        return jwtUtil.generateToken(user.getUsername());
+    
+        String token = jwtUtil.generateToken(user.getUsername());
+    
+        return LoginResponse.builder()
+            .avatar(user.getAvatar()) 
+            .username(user.getUsername())
+            .id(user.getId())
+            .role(user.getRole())
+            .token(token)
+            .build();
     }
+    
+
 
     public String saveOrUpdateGoogleUser(UserGoogleData userGoogleData) {
         Optional<UserEntity> existingUserOpt = userRepository.findByEmail(userGoogleData.getEmail());

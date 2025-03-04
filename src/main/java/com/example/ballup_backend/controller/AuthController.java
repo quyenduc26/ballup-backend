@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.ballup_backend.dto.req.auth.LoginRequest;
 import com.example.ballup_backend.dto.req.auth.RegisterRequest;
+import com.example.ballup_backend.dto.res.user.LoginResponse;
 import com.example.ballup_backend.service.AuthService;
 
 import io.jsonwebtoken.io.IOException;
@@ -36,7 +37,7 @@ public class AuthController {
     }
     
     @PostMapping("/login")
-    public ResponseEntity<String> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.loginUser(request));
     }
 
