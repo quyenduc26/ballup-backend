@@ -152,5 +152,23 @@ public class TeamService {
         teamRepository.save(team);
     }
 
+    @Transactional
+    public void deleteTeam(Long teamId, Long userId) {
+
+        TeamMemberEntity owner = teamMemberRepository.findByTeamIdAndMemberId(teamId, userId)
+            .orElseThrow(() -> new RuntimeException("Member does not belong to the specified team."));
+
+        if (!owner.getRole().equals(Role.OWNER)) {
+            throw new RuntimeException("Only the team owner can update member roles.");
+        }
+
+        TeamEntity team = teamRepository.getReferenceById(teamId);
+        
+        teamMemberRepository.deleteByTeamId(teamId);
+        // teamMemberRepository.deleteByTeam(team);
+
+        teamRepository.delete(team);
+    }
+
 
 }
