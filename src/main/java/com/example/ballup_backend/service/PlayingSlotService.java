@@ -1,5 +1,8 @@
 package com.example.ballup_backend.service;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,6 +20,7 @@ import com.example.ballup_backend.entity.UnavailableSlotEntity;
 import com.example.ballup_backend.entity.UserEntity;
 import com.example.ballup_backend.entity.UserEntity.Role;
 import com.example.ballup_backend.entity.BookingEntity.BookingStatus;
+import com.example.ballup_backend.entity.UnavailableSlotEntity.Status;
 import com.example.ballup_backend.repository.BookingRepository;
 import com.example.ballup_backend.repository.PlayingCenterRepository;
 import com.example.ballup_backend.repository.PlayingSlotRepository;
@@ -43,6 +47,9 @@ public class PlayingSlotService {
     @Autowired
     private UserRepository userRepository; 
 
+    @Autowired
+    private UnavailableSlotService unavailableSlotService;
+
     public PlayingSlotEntity createPlayingSlot(CreateSlotRequest request) {
         PlayingCenterEntity playingCenter = playingCenterRepository.findById(request.getPlayingCenterId())
             .orElseThrow(() -> new RuntimeException("Playing center not found"));
@@ -57,26 +64,42 @@ public class PlayingSlotService {
         return playingSlotRepository.save(slot);
     }
 
-    public UnavailableSlotEntity disableSlot(DisableSlotRequest request) {
+    public void disableSlot(DisableSlotRequest request) {
+
+        //convert time to  localDateTime
+        LocalDateTime fromDateTime = LocalDateTime.ofEpochSecond(request.getFromTime() / 1000, 0, ZoneOffset.UTC);
+        LocalDateTime toDateTime = LocalDateTime.ofEpochSecond(request.getToTime() / 1000, 0, ZoneOffset.UTC);
+
+        //check available
+        boolean isAvailable = unavailableSlotService.isSlotUnavailable(request.getPlayingSlotId(), fromDateTime, toDateTime);
+        if(!isAvailable) { 
+            throw new RuntimeException("Slot not available"); 
+        }
+
+        //check valid slot, user
         PlayingSlotEntity playingSlot = playingSlotRepository.findById(request.getPlayingSlotId())
             .orElseThrow(() -> new RuntimeException("Playing slot not found"));
     
         UserEntity user = userRepository.findById(request.getUserId())
             .orElseThrow(() -> new RuntimeException("User not found"));
     
+        //prepaer role
         UnavailableSlotEntity.createdBy createdBy = user.getRole().equals(Role.OWNER) 
             ? UnavailableSlotEntity.createdBy.BY_OWNER 
             : UnavailableSlotEntity.createdBy.BY_USER;
 
+        //create unavailable entity
         UnavailableSlotEntity unavailableSlot = UnavailableSlotEntity.builder()
-            .fromTime(request.getFromTime())
-            .toTime(request.getToTime())
+            .fromTime(Timestamp.valueOf(fromDateTime))
+            .toTime(Timestamp.valueOf(toDateTime))
             .slot(playingSlot)
             .creator(user)
             .createBy(createdBy) 
+            .status(Status.SUBMITTING)
             .build();
         unavailableSlotRepository.save(unavailableSlot);
 
+        //if user -> create booking
         if(user.getRole().equals(Role.USER)){
             BookingEntity bookingEntity = BookingEntity.builder()
                 .status(BookingStatus.REQUESTED)
@@ -85,13 +108,13 @@ public class PlayingSlotService {
                 .build();
             bookingRepository.save(bookingEntity);
         }     
-    
-        return unavailableSlot;
     }
 
     public List<UnavailableSlotResponse> getDisabledSlots(Long slotId) {
+
         PlayingSlotEntity playingSlot = playingSlotRepository.findById(slotId)
             .orElseThrow(() -> new RuntimeException("Playing slot not found"));
+
         List<UnavailableSlotEntity> unavailableSlots = unavailableSlotRepository.findBySlot(playingSlot);
     
         List<UnavailableSlotResponse> unavailableSlotsResponses = unavailableSlots.stream()

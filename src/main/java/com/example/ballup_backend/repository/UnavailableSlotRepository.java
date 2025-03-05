@@ -13,7 +13,7 @@ import com.example.ballup_backend.entity.UnavailableSlotEntity;
 
 @Repository
 public interface UnavailableSlotRepository extends JpaRepository<UnavailableSlotEntity, Long> {
-    @Query("SELECT u FROM UnavailableSlotEntity u JOIN FETCH u.creator WHERE u.slot = :slot")
+    @Query("SELECT u FROM UnavailableSlotEntity u JOIN FETCH u.creator WHERE u.slot = :slot AND u.status IN ('PROCESSING', 'DONE') ")
     List<UnavailableSlotEntity> findBySlot(@Param("slot") PlayingSlotEntity slot);
 
     @Query("SELECT u.slot FROM UnavailableSlotEntity u WHERE (u.fromTime BETWEEN :fromDateTime AND :toDateTime) OR (u.toTime BETWEEN :fromDateTime AND :toDateTime)")
@@ -21,5 +21,19 @@ public interface UnavailableSlotRepository extends JpaRepository<UnavailableSlot
 
     @Query("SELECT u.id FROM UnavailableSlotEntity u WHERE u.slot.id IN :slotIds AND u.createBy = 'BY_USER'")
     List<Long> findBySlotIdAndCreatedByUser(@Param("slotIds") List<Long> slotIds);
+
+    @Query("""
+    SELECT COUNT(u) > 0 FROM UnavailableSlotEntity u
+    WHERE u.slot.id = :slotId 
+    AND (
+        (u.fromTime BETWEEN :fromTime AND :toTime) 
+        OR (u.toTime BETWEEN :fromTime AND :toTime)
+        OR (:fromTime BETWEEN u.fromTime AND u.toTime) 
+        OR (:toTime BETWEEN u.fromTime AND u.toTime)
+        )
+    AND u.status IN ('PROCESSING', 'DONE')
+    """)
+    boolean isSlotUnavailable(@Param("slotId") Long slotId, @Param("fromTime") LocalDateTime fromTime, @Param("toTime") LocalDateTime toTime);
+
 
 }

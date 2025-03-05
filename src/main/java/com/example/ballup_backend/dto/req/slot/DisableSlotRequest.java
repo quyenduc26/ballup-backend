@@ -1,6 +1,5 @@
 package com.example.ballup_backend.dto.req.slot;
 
-import java.sql.Timestamp;
 
 import jakarta.validation.constraints.*;
 import lombok.Builder;
@@ -19,9 +18,9 @@ public class DisableSlotRequest {
     private Long playingSlotId;
 
     @NotNull
-    private Timestamp fromTime;
+    private Long fromTime;
 
-    private Timestamp toTime;
+    private Long toTime;
 
 
 }

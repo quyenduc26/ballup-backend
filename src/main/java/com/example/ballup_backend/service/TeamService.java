@@ -60,15 +60,27 @@ public class TeamService {
     public String joinTeam(Long userId, Long teamId) {
         TeamEntity team = teamRepository.findById(teamId)
             .orElseThrow(() -> new RuntimeException("Team not found"));
+        
         UserEntity user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found"));
+    
+        // Kiểm tra xem user đã tham gia team nào có cùng sport hay chưa
+        boolean isAlreadyInTeam = teamMemberRepository.existsByUserIdAndTeamSport(userId, team.getSport());
+        
+        if (isAlreadyInTeam) {
+            throw new RuntimeException("You are already a member of a team in the same sport: " + team.getSport().name());
+        }
+    
+        // Thêm user vào team nếu chưa tham gia team nào có cùng sport
         TeamMemberEntity teamMember = TeamMemberEntity.builder()
             .team(team)
             .user(user)
             .build();
+    
         teamMemberRepository.save(teamMember);
-        return "User " + user.getUsername() + " joined team " + team.getName();
+        return "User " + user.getUsername() + " has successfully joined the team: " + team.getName();
     }
+    
 
     public List<TeamResponse> getAllTeams(String name, String location, TeamEntity.Sport sport, String sortBy) {
         Specification<TeamEntity> spec = Specification.where(null);
@@ -165,9 +177,8 @@ public class TeamService {
         TeamEntity team = teamRepository.getReferenceById(teamId);
         
         teamMemberRepository.deleteByTeamId(teamId);
-        // teamMemberRepository.deleteByTeam(team);
 
-        teamRepository.delete(team);
+        teamRepository.deleteTeamById(teamId);
     }
 
 

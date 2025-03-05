@@ -120,6 +120,7 @@ public class PlayingCenterService {
                 .collect(Collectors.toList());
 
         return PlayingCenterResponse.builder()
+                .id(playingCenter.getId())
                 .name(playingCenter.getName())
                 .description(playingCenter.getDescription())
                 .address(playingCenter.getAddress())

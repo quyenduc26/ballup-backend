@@ -1,8 +1,6 @@
 package com.example.ballup_backend.entity;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 

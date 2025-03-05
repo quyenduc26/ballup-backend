@@ -15,11 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.ballup_backend.dto.req.slot.DisableSlotRequest;
-import com.example.ballup_backend.dto.req.slot.UpdateSlotRequest;
 import com.example.ballup_backend.dto.res.slot.UnavailableSlotResponse;
 import com.example.ballup_backend.service.PlayingSlotService;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 
 @RestController
