@@ -1,8 +1,11 @@
 package com.example.ballup_backend.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.ballup_backend.dto.req.team.KickTeamMemberRequest;
 import com.example.ballup_backend.dto.req.team.UpdateMemberRoleRequest;
 import com.example.ballup_backend.entity.TeamMemberEntity;
+import com.example.ballup_backend.entity.TeamEntity.Sport;
 import com.example.ballup_backend.entity.TeamMemberEntity.Role;
 import com.example.ballup_backend.service.TeamMemberService;
     
@@ -45,6 +49,11 @@ public class TeamMemberController {
     public ResponseEntity<String> kickMember(@PathVariable Long teamId, @RequestParam Long memberId) {
         teamMemberService.leaveTeam(teamId, memberId);
         return ResponseEntity.ok("Member kicked successfully");
+    }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<Long>> getTeamMemberIds( @PathVariable Long userId,  @RequestParam Sport sport) {
+        return ResponseEntity.ok(teamMemberService.getTeamMemberIds(userId, sport));
     }
 
 

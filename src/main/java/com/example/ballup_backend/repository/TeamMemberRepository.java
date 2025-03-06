@@ -1,6 +1,7 @@
 package com.example.ballup_backend.repository;
 
 import com.example.ballup_backend.entity.TeamEntity;
+import com.example.ballup_backend.entity.TeamEntity.Sport;
 import com.example.ballup_backend.entity.TeamMemberEntity;
 import com.example.ballup_backend.entity.UserEntity;
 
@@ -35,6 +36,15 @@ public interface TeamMemberRepository extends JpaRepository<TeamMemberEntity, Lo
     @Modifying
     @Query("DELETE FROM TeamMemberEntity tm WHERE tm.team = :team")
     void deleteByTeam(@Param("team") TeamEntity team);
-    
+
+    @Query("SELECT tm.user.id FROM TeamMemberEntity tm WHERE tm.team.id = :teamId")
+    List<Long> findAllMemberIdsByTeamId(@Param("teamId") Long teamId);
+
+    @Query("SELECT tm.team.id FROM TeamMemberEntity tm WHERE tm.user.id = :userId AND tm.team.sport = :sportType")
+    Long findTeamsByUserIdAndSport(@Param("userId") Long userId, @Param("sportType") Sport sportType);
+
+    @Query("SELECT COUNT(tm) > 0 FROM TeamMemberEntity tm WHERE tm.user.id = :userId AND tm.team.sport = :sport")
+    boolean existsByUserIdAndTeamSport(@Param("userId") Long userId, @Param("sport") Sport sport);
+
 }
 

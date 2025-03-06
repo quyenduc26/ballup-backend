@@ -2,7 +2,7 @@ package com.example.ballup_backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.security.Timestamp;
+import java.sql.Timestamp;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -20,8 +20,23 @@ public class GameEntity {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "time", nullable = false)
-    private Timestamp time; 
+    @Column(name = "name", nullable = false)
+    private String name; 
+
+    @Column(name = "fromTime", nullable = false)
+    private Timestamp fromTime; 
+
+    @Column(name = "toTime", nullable = false)
+    private Timestamp toTime; 
+
+    @Column(name = "location", nullable = false)
+    private String location; 
+
+    @Column(name = "description", nullable = false)
+    private String description; 
+
+    @Column(name = "cover", nullable = false)
+    private String cover; 
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -32,11 +47,19 @@ public class GameEntity {
     private UserEntity creator;
 
     @OneToOne
-    @JoinColumn(name = "conversation_id", unique = true)
+    @JoinColumn(name = "conversation_id", unique = true, nullable = true)
     private ConversationEntity conversation;
 
     @ManyToOne
-    @JoinColumn(name = "playing_slot_id", nullable = false)
+    @JoinColumn(name = "playing_slot_id", nullable = true)
     private PlayingSlotEntity playingSlot;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false)
+    private GameType type;
+
+    public enum GameType {
+        FOOTBALL,BADMINTON
+    }
 }
 

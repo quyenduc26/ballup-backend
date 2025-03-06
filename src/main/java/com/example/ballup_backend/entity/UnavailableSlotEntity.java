@@ -37,8 +37,16 @@ public class UnavailableSlotEntity {
     @Column(name = "create_by", nullable = false)
     private createdBy createBy;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private Status status;
+
     public enum createdBy {
         BY_USER, BY_OWNER
+    }
+
+    public enum Status {
+        SUBMITTING, PROCESSING, PENDING, DONE
     }
 
     @CreationTimestamp
