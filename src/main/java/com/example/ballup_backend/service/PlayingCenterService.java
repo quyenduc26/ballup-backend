@@ -118,6 +118,15 @@ public class PlayingCenterService {
         List<String> imageUrls = playingCenterImageRepository.findByCenter(playingCenter).stream()
                 .map(PlayingCenterImageEntity::getImage)
                 .collect(Collectors.toList());
+        List<PlayingSlotResponse> slotResponses = playingSlotRepository.findByPlayingCenter(playingCenter).stream()
+        .map(slot -> PlayingSlotResponse.builder()
+                .id(slot.getId())
+                .name(slot.getName())
+                .nightPrice(slot.getNightPrice())
+                .primaryPrice(slot.getPrimaryPrice())
+                .build()) 
+        .collect(Collectors.toList()); 
+        
 
         return PlayingCenterResponse.builder()
                 .id(playingCenter.getId())
@@ -125,6 +134,7 @@ public class PlayingCenterService {
                 .description(playingCenter.getDescription())
                 .address(playingCenter.getAddress())
                 .imageUrls(imageUrls)
+                .slots(slotResponses)
                 .build();
     }
 

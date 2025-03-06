@@ -30,7 +30,7 @@ public class PlayingCenterController {
     PlayingCenterService playingCenterService;
 
     @GetMapping("/{id}")
-    public  ResponseEntity<PlayingCenterResponse> getPlayingCenter(@PathVariable Long id) {
+    public ResponseEntity<PlayingCenterResponse> getPlayingCenter(@PathVariable Long id) {
         PlayingCenterResponse playingCenterResponse = playingCenterService.getCenterInfo(id);
         return ResponseEntity.status(HttpStatus.OK).body(playingCenterResponse);
     }

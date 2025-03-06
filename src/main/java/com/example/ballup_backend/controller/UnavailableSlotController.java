@@ -1,5 +1,6 @@
 package com.example.ballup_backend.controller;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
@@ -22,10 +23,10 @@ public class UnavailableSlotController {
 
     @GetMapping("/check/{slotId}")
     public boolean checkSlotUnavailable(@PathVariable Long slotId, @RequestParam Long fromTime, @RequestParam Long toTime) {
-        LocalDateTime fromDateTime = LocalDateTime.ofEpochSecond(fromTime / 1000, 0, ZoneOffset.UTC);
-        LocalDateTime toDateTime = LocalDateTime.ofEpochSecond(toTime / 1000, 0, ZoneOffset.UTC);
+        Timestamp fromTimestamp = new Timestamp(fromTime);
+        Timestamp toTimestamp = new Timestamp(toTime);
         
-        return unavailableSlotService.isSlotUnavailable(slotId, fromDateTime, toDateTime);
+        return unavailableSlotService.isSlotUnavailable(slotId, fromTimestamp, toTimestamp);
     }
     
 }

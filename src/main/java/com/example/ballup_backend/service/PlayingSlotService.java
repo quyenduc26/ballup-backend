@@ -1,8 +1,6 @@
 package com.example.ballup_backend.service;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -66,13 +64,16 @@ public class PlayingSlotService {
 
     public void disableSlot(DisableSlotRequest request) {
 
-        //convert time to  localDateTime
-        LocalDateTime fromDateTime = LocalDateTime.ofEpochSecond(request.getFromTime() / 1000, 0, ZoneOffset.UTC);
-        LocalDateTime toDateTime = LocalDateTime.ofEpochSecond(request.getToTime() / 1000, 0, ZoneOffset.UTC);
+        Timestamp fromTimestamp = new Timestamp(request.getFromTime());
+        Timestamp toTimestamp = new Timestamp(request.getToTime());
+ 
+        // In kết quả
+        System.out.println("From Timestamp: " + fromTimestamp.toLocalDateTime());
+        System.out.println("To Timestamp: " + toTimestamp.toLocalDateTime());
 
         //check available
-        boolean isAvailable = unavailableSlotService.isSlotUnavailable(request.getPlayingSlotId(), fromDateTime, toDateTime);
-        if(!isAvailable) { 
+        boolean isAvailable = unavailableSlotService.isSlotUnavailable(request.getPlayingSlotId(), fromTimestamp, toTimestamp);
+        if(isAvailable) { 
             throw new RuntimeException("Slot not available"); 
         }
 
@@ -90,8 +91,8 @@ public class PlayingSlotService {
 
         //create unavailable entity
         UnavailableSlotEntity unavailableSlot = UnavailableSlotEntity.builder()
-            .fromTime(Timestamp.valueOf(fromDateTime))
-            .toTime(Timestamp.valueOf(toDateTime))
+            .fromTime(fromTimestamp)
+            .toTime(toTimestamp)
             .slot(playingSlot)
             .creator(user)
             .createBy(createdBy) 

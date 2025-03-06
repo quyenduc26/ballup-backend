@@ -64,23 +64,23 @@ public class GameService {
         conversationRepository.save(conversation);
         
         //convert time to  localDateTime
-        LocalDateTime fromDateTime = LocalDateTime.ofEpochSecond(request.getFromTime() / 1000, 0, ZoneOffset.UTC);
-        LocalDateTime toDateTime = LocalDateTime.ofEpochSecond(request.getToTime() / 1000, 0, ZoneOffset.UTC);
+        Timestamp fromTimestamp = new Timestamp(request.getFromTime());
+        Timestamp toTimestamp = new Timestamp(request.getToTime());
         
         GameEntity game;
         if (request.getSlotId() != null) {
             PlayingSlotEntity slot = slotRepository.getReferenceById(request.getSlotId());
 
             //check slot available
-            boolean isAvailable = unavailableSlotService.isSlotUnavailable(request.getSlotId(), fromDateTime, toDateTime);
+            boolean isAvailable = unavailableSlotService.isSlotUnavailable(request.getSlotId(), fromTimestamp, toTimestamp);
             if(isAvailable) { 
                 throw new RuntimeException("Slot not available"); 
             }
 
             //create unavailable slot
             UnavailableSlotEntity unavailableSlot = UnavailableSlotEntity.builder()
-                .fromTime(Timestamp.valueOf(fromDateTime))
-                .toTime(Timestamp.valueOf(toDateTime))
+                .fromTime(fromTimestamp)
+                .toTime(toTimestamp)
                 .slot(slot)
                 .creator(creator)
                 .createBy(createdBy.BY_USER) 
@@ -101,8 +101,8 @@ public class GameService {
             game = GameEntity.builder()
                 .name(request.getName())
                 .creator(creator)
-                .fromTime(Timestamp.valueOf(fromDateTime))
-                .toTime(Timestamp.valueOf(toDateTime))
+                .fromTime(fromTimestamp)
+                .toTime(toTimestamp)
                 .location(request.getLocation())
                 .description(request.getDescription())
                 .type(request.getType())
@@ -114,8 +114,8 @@ public class GameService {
             game = GameEntity.builder()
             .name(request.getName())
             .creator(creator)
-            .fromTime(Timestamp.valueOf(fromDateTime))
-            .toTime(Timestamp.valueOf(toDateTime))
+            .fromTime(fromTimestamp)
+            .toTime(toTimestamp)
             .location(request.getLocation())
             .description(request.getDescription())
             .type(request.getType())
