@@ -68,7 +68,7 @@ public class TeamService {
         boolean isAlreadyInTeam = teamMemberRepository.existsByUserIdAndTeamSport(userId, team.getSport());
         
         if (isAlreadyInTeam) {
-            throw new RuntimeException("You are already a member of a team in the same sport: " + team.getSport().name());
+            throw new RuntimeException("You are already a member of a team in the same sport ");
         }
     
         // Thêm user vào team nếu chưa tham gia team nào có cùng sport

@@ -3,6 +3,7 @@ package com.example.ballup_backend.service;
 import com.example.ballup_backend.dto.req.team.KickTeamMemberRequest;
 import com.example.ballup_backend.dto.req.team.UpdateMemberRoleRequest;
 import com.example.ballup_backend.entity.TeamEntity;
+import com.example.ballup_backend.entity.TeamEntity.Sport;
 import com.example.ballup_backend.entity.TeamMemberEntity;
 import com.example.ballup_backend.entity.UserEntity;
 import com.example.ballup_backend.exception.BaseException;
@@ -14,6 +15,8 @@ import com.example.ballup_backend.repository.UserRepository;
 import jakarta.transaction.Transactional;
 
 import com.example.ballup_backend.repository.TeamMemberRepository;
+
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -90,4 +93,10 @@ public class TeamMemberService {
     public void deleteByTeamId(Long teamId) {
         teamMemberRepository.deleteByTeamId(teamId);
     }
+
+    public List<Long> getTeamMemberIds( Long userId, Sport sport) {
+        Long teamId = teamMemberRepository.findTeamsByUserIdAndSport(userId, sport);
+        return teamMemberRepository.findAllMemberIdsByTeamId(teamId);
+    }
+
 }

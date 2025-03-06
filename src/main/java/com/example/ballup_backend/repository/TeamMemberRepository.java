@@ -40,8 +40,8 @@ public interface TeamMemberRepository extends JpaRepository<TeamMemberEntity, Lo
     @Query("SELECT tm.user.id FROM TeamMemberEntity tm WHERE tm.team.id = :teamId")
     List<Long> findAllMemberIdsByTeamId(@Param("teamId") Long teamId);
 
-    @Query("SELECT tm.team FROM TeamMemberEntity tm WHERE tm.user.id = :userId AND tm.team.sport = :sportType")
-    List<TeamEntity> findTeamsByUserIdAndSport(@Param("userId") Long userId, @Param("sportType") Sport sportType);
+    @Query("SELECT tm.team.id FROM TeamMemberEntity tm WHERE tm.user.id = :userId AND tm.team.sport = :sportType")
+    Long findTeamsByUserIdAndSport(@Param("userId") Long userId, @Param("sportType") Sport sportType);
 
     @Query("SELECT COUNT(tm) > 0 FROM TeamMemberEntity tm WHERE tm.user.id = :userId AND tm.team.sport = :sport")
     boolean existsByUserIdAndTeamSport(@Param("userId") Long userId, @Param("sport") Sport sport);
