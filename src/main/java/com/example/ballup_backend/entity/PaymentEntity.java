@@ -20,7 +20,7 @@ public class PaymentEntity {
     private Long id;
 
     @Column(name = "amount", nullable = false)
-    private Integer amount;
+    private Long amount;
 
     @ManyToOne
     @JoinColumn(name = "creator", nullable = false)

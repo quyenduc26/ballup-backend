@@ -19,7 +19,7 @@ public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
     List<BookingEntity> findBySlotIdInAndStatus(@Param("bookingSlots") List<Long> bookingSlots, @Param("requested") BookingEntity.BookingStatus requested);
 
     @Query("SELECT b FROM BookingEntity b WHERE b.status = :status AND b.bookingSlot.id IN :unavailableSlotIds")
-    List<BookingEntity> findRequestedBookingsByUnavailableSlots(
+    List<BookingEntity> findBookingsByUnavailableSlotsAndStatus(
         @Param("status") BookingStatus status, 
         @Param("unavailableSlotIds") List<Long> unavailableSlotIds
     );
