@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.ballup_backend.service.BookingService;
@@ -16,9 +17,9 @@ public class BookingController {
     @Autowired
     private BookingService bookingService;
 
-    @PatchMapping("/deposit")
-    public ResponseEntity<String> rejectBooking(@PathVariable Long bookingId) {
-        bookingService.depositBookingRequest(bookingId);
+    @PatchMapping("/{bookingId}/deposit/{amount}")
+    public ResponseEntity<String> depositBooking(@PathVariable Long bookingId, @PathVariable Long amount,  @RequestParam Long userId) {
+        bookingService.depositBookingRequest(bookingId, amount, userId);
         return ResponseEntity.ok("Booking deposited successfully");
     }
 
