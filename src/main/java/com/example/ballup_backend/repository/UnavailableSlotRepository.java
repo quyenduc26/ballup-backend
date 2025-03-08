@@ -1,7 +1,6 @@
 package com.example.ballup_backend.repository;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,11 +13,18 @@ import com.example.ballup_backend.entity.UnavailableSlotEntity;
 
 @Repository
 public interface UnavailableSlotRepository extends JpaRepository<UnavailableSlotEntity, Long> {
-    @Query("SELECT u FROM UnavailableSlotEntity u JOIN FETCH u.creator WHERE u.slot = :slot AND u.status IN ('PROCESSING', 'DONE') ")
+    @Query("SELECT u FROM UnavailableSlotEntity u JOIN FETCH u.creator WHERE u.slot = :slot AND u.status IN ('PROCESSING', 'DONE')")
     List<UnavailableSlotEntity> findBySlot(@Param("slot") PlayingSlotEntity slot);
 
-    @Query("SELECT u.slot FROM UnavailableSlotEntity u WHERE (u.fromTime BETWEEN :fromDateTime AND :toDateTime) OR (u.toTime BETWEEN :fromDateTime AND :toDateTime)")
-    List<Long> findUnavailableSlots(@Param("fromDateTime") LocalDateTime fromDateTime, @Param("toDateTime") LocalDateTime toDateTime);
+    @Query("SELECT u.slot.id FROM UnavailableSlotEntity u " +
+        "WHERE ((u.fromTime BETWEEN :fromDateTime AND :toDateTime) " +
+        "   OR (u.toTime BETWEEN :fromDateTime AND :toDateTime) " +
+        "   OR (:fromDateTime BETWEEN u.fromTime AND u.toTime) " +
+        "   OR (:toDateTime BETWEEN u.fromTime AND u.toTime)) " +
+        "AND u.status IN ('PROCESSING', 'DONE')")
+    List<Long> findUnavailableSlots(@Param("fromDateTime") Timestamp fromDateTime, @Param("toDateTime") Timestamp toDateTime);
+
+
 
     @Query("SELECT u.id FROM UnavailableSlotEntity u WHERE u.slot.id IN :slotIds AND u.createBy = 'BY_USER'")
     List<Long> findBySlotIdAndCreatedByUser(@Param("slotIds") List<Long> slotIds);

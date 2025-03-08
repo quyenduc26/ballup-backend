@@ -14,7 +14,7 @@ import com.example.ballup_backend.entity.PlayingSlotEntity;
 public interface PlayingSlotRepository extends JpaRepository<PlayingSlotEntity, Long> {
      List<PlayingSlotEntity> findByPlayingCenter(PlayingCenterEntity playingCenter);
 
-     @Query("SELECT s.playingCenter.id, s.id FROM PlayingSlotEntity s WHERE s.id IN :slotIds")
+     @Query("SELECT ps.playingCenter.id, ps.id FROM PlayingSlotEntity ps WHERE ps.id IN :slotIds")
      List<Object[]> findCentersBySlotIds(@Param("slotIds") List<Long> slotIds);
 
      @Query("SELECT s.id FROM PlayingSlotEntity s WHERE s.playingCenter = :playingCenter")
