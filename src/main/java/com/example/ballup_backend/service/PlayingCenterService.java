@@ -1,15 +1,13 @@
 package com.example.ballup_backend.service;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +17,7 @@ import com.example.ballup_backend.dto.res.center.CardPlayingCenterResponse;
 import com.example.ballup_backend.dto.res.center.PlayingCenterResponse;
 import com.example.ballup_backend.dto.res.slot.PlayingSlotResponse;
 import com.example.ballup_backend.entity.PlayingCenterEntity;
+import com.example.ballup_backend.entity.PlayingCenterEntity.PlayingCenterType;
 import com.example.ballup_backend.entity.PlayingCenterImageEntity;
 import com.example.ballup_backend.entity.PlayingSlotEntity;
 import com.example.ballup_backend.entity.UserEntity;
@@ -98,7 +97,6 @@ public class PlayingCenterService {
                 .build())
         .collect(Collectors.toList());
 
-    
             return PlayingCenterResponse.builder()
                 .id(center.getId())
                 .name(center.getName())
@@ -147,35 +145,36 @@ public class PlayingCenterService {
 
     
 
-    public Page<CardPlayingCenterResponse> getCenterByCriteria(
-        String name, String location, LocalDateTime fromDateTime, LocalDateTime toDateTime,
-        String sortBy, String sortDirection, int page, int size) {
-
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
-        PageRequest pageable = PageRequest.of(page, size, sort);
-
+    public List<CardPlayingCenterResponse> getCenterByCriteria( String name, String address, Long fromDateTime, Long toDateTime, String sortBy, String sortDirection, String sport) {
+ 
         // 1. Lọc theo thời gian trước
         List<Long> excludedCenters = new ArrayList<>();
         if (fromDateTime != null && toDateTime != null) {
-            // Lấy danh sách slotId bị chiếm trong khoảng thời gian
-            List<Long> unavailableSlotIds = unavailableSlotRepository.findUnavailableSlots(fromDateTime, toDateTime);
+                System.out.println("kgjdfhghj");
+                Timestamp fromTimestamp = new Timestamp(fromDateTime);
+                Timestamp toTimestamp = new Timestamp(toDateTime);
+
+                // Lấy danh sách slotId bị chiếm trong khoảng thời gian
+                List<Long> unavailableSlotIds = unavailableSlotRepository.findUnavailableSlots(fromTimestamp, toTimestamp);
+                System.out.println(unavailableSlotIds);
 
             if (!unavailableSlotIds.isEmpty()) {
                 // Lấy danh sách centerId có slot bị chiếm
                 Map<Long, List<Long>> centerSlotMap = playingSlotRepository.findCentersBySlotIds(unavailableSlotIds)
                         .stream()
+                        .map(result -> new AbstractMap.SimpleEntry<>((Long) result[0], (Long) result[1]))
                         .collect(Collectors.groupingBy(
-                                result -> (Long) result[0], // centerId
-                                Collectors.mapping(result -> (Long) result[1], Collectors.toList()) // slotId
+                                Map.Entry::getKey,
+                                Collectors.mapping(Map.Entry::getValue, Collectors.toList())
                         ));
                 // Loại bỏ center có tất cả slot bị chiếm
                 excludedCenters = centerSlotMap.entrySet().stream()
-                        .filter(entry -> entry.getValue().containsAll(unavailableSlotIds)) // Center có tất cả slot bị chiếm
+                        .filter(entry -> entry.getValue().containsAll(unavailableSlotIds)) 
                         .map(Map.Entry::getKey)
                         .collect(Collectors.toList());
             }
         }
-        // 2. Lọc theo tên và location
+        // 2. Lọc theo tên và address
         Specification<PlayingCenterEntity> spec = Specification.where(null);
         if (!excludedCenters.isEmpty()) {
             spec = spec.and(PlayingCenterSpecification.excludeCenters(excludedCenters));
@@ -183,13 +182,17 @@ public class PlayingCenterService {
         if (name != null && !name.isEmpty()) {
             spec = spec.and(PlayingCenterSpecification.filterByName(name));
         }
-        if (location != null && !location.isEmpty()) {
-            spec = spec.and(PlayingCenterSpecification.filterByAddress(location));
+        if (address != null && !address.isEmpty()) {
+            spec = spec.and(PlayingCenterSpecification.filterByAddress(address));
+        }
+        if (sport != null && !sport.isEmpty()) {
+                PlayingCenterType sportEnum = PlayingCenterType.valueOf(sport.toUpperCase());
+                spec = spec.and(PlayingCenterSpecification.filterBySport(sportEnum));
         }
 
-        Page<PlayingCenterEntity> playingCenters = playingCenterRepository.findAll(spec, pageable);
+        List<PlayingCenterEntity> playingCenters = playingCenterRepository.findAll(spec);
 
-        return playingCenters.map(center -> {
+        return playingCenters.stream().map(center -> {
                 PlayingSlotEntity firstSlot = playingSlotRepository.findByPlayingCenter(center).stream().findFirst().orElse(null);
                 String image = playingCenterImageRepository.findByCenter(center).get(0).getImage();
     
@@ -203,7 +206,7 @@ public class PlayingCenterService {
                     .nightPrice(firstSlot != null ? firstSlot.getNightPrice() : null)
                     .image(image)
                     .build();
-            });
+            }).collect(Collectors.toList());
         
     }
 

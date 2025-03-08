@@ -52,23 +52,16 @@ public class PlayingCenterController {
 
     
     @GetMapping
-    public ResponseEntity<Page<CardPlayingCenterResponse>> searchPlayingCenters(
+    public ResponseEntity<List<CardPlayingCenterResponse>> searchPlayingCenters(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String address,
             @RequestParam(required = false) Long fromTime,
             @RequestParam(required = false) Long toTime,
+            @RequestParam(required = false) String sport,
             @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "ASC") String sortDirection,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        
-        LocalDateTime fromDateTime = fromTime != null ? 
-            LocalDateTime.ofInstant(Instant.ofEpochMilli(fromTime), ZoneId.systemDefault()) : null;
+            @RequestParam(defaultValue = "ASC") String sortDirection){
     
-        LocalDateTime toDateTime = toTime != null ? 
-            LocalDateTime.ofInstant(Instant.ofEpochMilli(toTime), ZoneId.systemDefault()) : null;
-    
-        Page<CardPlayingCenterResponse> result = playingCenterService.getCenterByCriteria(name, address, fromDateTime, toDateTime, sortBy, sortDirection, page, size);
+        List<CardPlayingCenterResponse> result = playingCenterService.getCenterByCriteria(name, address, fromTime, toTime, sortBy, sortDirection, sport);
         return ResponseEntity.ok(result);
     }
     
