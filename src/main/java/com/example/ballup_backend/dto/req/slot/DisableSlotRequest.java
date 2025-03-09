@@ -1,6 +1,7 @@
 package com.example.ballup_backend.dto.req.slot;
 
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,6 +22,9 @@ public class DisableSlotRequest {
     private Long fromTime;
 
     private Long toTime;
+
+    @Nullable
+    private Long amount;
 
 
 }

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.ballup_backend.dto.req.owner.BookingRequestResponse;
 import com.example.ballup_backend.dto.req.owner.PaymentRequestResponse;
+import com.example.ballup_backend.dto.res.booking.BookingDetailResponse;
 import com.example.ballup_backend.entity.BookingEntity;
 import com.example.ballup_backend.entity.PaymentEntity;
 import com.example.ballup_backend.entity.BookingEntity.BookingStatus;
@@ -23,6 +24,7 @@ import com.example.ballup_backend.repository.PlayingCenterRepository;
 import com.example.ballup_backend.repository.UnavailableSlotRepository;
 import com.example.ballup_backend.repository.UserRepository;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
 
@@ -108,19 +110,15 @@ public class BookingService {
         //update status cho unavailable slot
         UnavailableSlotEntity unavailableSlot = unavailableSlotRepository.getReferenceById(booking.getBookingSlot().getId());
         unavailableSlot.setStatus(Status.PROCESSING);
-        unavailableSlotRepository.save(unavailableSlot);
+        unavailableSlotRepository.save(unavailableSlot); 
 
         //tạo payment cho booking
-        PaymentEntity bookingPayment = PaymentEntity.builder()
-            .amount(amount)
-            .creator(user)
-            .status(PaymentStatus.PENDING)
-            .build();
-        PaymentEntity savedPaymentEntity = paymentRepository.save(bookingPayment);
-
+        PaymentEntity bookingPayment = paymentRepository.getReferenceById(booking.getPayment().getId());
+        if( bookingPayment.getId() == user.getId()) bookingPayment.setCreator(user);
+        
         //save 
+        paymentRepository.save(bookingPayment);
         booking.setStatus(BookingEntity.BookingStatus.DEPOSITED);
-        booking.setPayment(savedPaymentEntity);
         bookingRepository.save(booking);
     }
     
@@ -180,5 +178,20 @@ public class BookingService {
         return payementBookingResponse;
     }
 
+    public BookingDetailResponse getBookingDetail(Long bookingId) {
+        return bookingRepository.findById(bookingId)
+                .map(booking -> BookingDetailResponse.builder()
+                        .bookingId(booking.getId())
+                        .user(booking.getPayment().getCreator().getUsername())
+                        .amount(booking.getPayment().getAmount())
+                        .slotName(booking.getBookingSlot().getSlot().getName())
+                        .centerName(booking.getBookingSlot().getSlot().getPlayingCenter().getName())
+                        .centerAddress(booking.getBookingSlot().getSlot().getPlayingCenter().getAddress())
+                        .bookingTime(booking.getCreatedAt())
+                        .status(booking.getStatus())
+                        .build()
+                )
+                .orElseThrow(() -> new EntityNotFoundException("Booking not found with id: " + bookingId));
+    }
     
 }

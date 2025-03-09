@@ -18,8 +18,11 @@ import com.example.ballup_backend.entity.UnavailableSlotEntity;
 import com.example.ballup_backend.entity.UserEntity;
 import com.example.ballup_backend.entity.UserEntity.Role;
 import com.example.ballup_backend.entity.BookingEntity.BookingStatus;
+import com.example.ballup_backend.entity.PaymentEntity;
+import com.example.ballup_backend.entity.PaymentEntity.PaymentStatus;
 import com.example.ballup_backend.entity.UnavailableSlotEntity.Status;
 import com.example.ballup_backend.repository.BookingRepository;
+import com.example.ballup_backend.repository.PaymentRepository;
 import com.example.ballup_backend.repository.PlayingCenterRepository;
 import com.example.ballup_backend.repository.PlayingSlotRepository;
 import com.example.ballup_backend.repository.UnavailableSlotRepository;
@@ -48,6 +51,9 @@ public class PlayingSlotService {
     @Autowired
     private UnavailableSlotService unavailableSlotService;
 
+    @Autowired
+    private PaymentRepository paymentRepository; 
+
     public PlayingSlotEntity createPlayingSlot(CreateSlotRequest request) {
         PlayingCenterEntity playingCenter = playingCenterRepository.findById(request.getPlayingCenterId())
             .orElseThrow(() -> new RuntimeException("Playing center not found"));
@@ -62,7 +68,7 @@ public class PlayingSlotService {
         return playingSlotRepository.save(slot);
     }
 
-    public void disableSlot(DisableSlotRequest request) {
+    public Long disableSlot(DisableSlotRequest request) {
 
         Timestamp fromTimestamp = new Timestamp(request.getFromTime());
         Timestamp toTimestamp = new Timestamp(request.getToTime());
@@ -102,13 +108,26 @@ public class PlayingSlotService {
 
         //if user -> create booking
         if(user.getRole().equals(Role.USER)){
+            //tạo payment cho booking
+            PaymentEntity bookingPayment = PaymentEntity.builder()
+                .amount(request.getAmount())
+                .creator(user)
+                .status(PaymentStatus.PENDING)
+                .build();
+            PaymentEntity savedPaymentEntity = paymentRepository.save(bookingPayment);
+
             BookingEntity bookingEntity = BookingEntity.builder()
                 .status(BookingStatus.REQUESTED)
-                .payment(null)
+                .payment(savedPaymentEntity)
                 .bookingSlot(unavailableSlot)
                 .build();
             bookingRepository.save(bookingEntity);
-        }     
+
+            return bookingEntity.getId();
+        }   
+
+        return unavailableSlot.getId();
+        
     }
 
     public List<UnavailableSlotResponse> getDisabledSlots(Long slotId) {

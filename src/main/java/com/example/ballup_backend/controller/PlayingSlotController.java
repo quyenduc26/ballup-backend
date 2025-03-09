@@ -29,9 +29,9 @@ public class PlayingSlotController {
 
 
     @PostMapping("/takeSlot")
-    public ResponseEntity<String> disableSlot(@Valid @RequestBody DisableSlotRequest request) {
-        playingSlotService.disableSlot(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Take playing slot successfully.");
+    public ResponseEntity<Long> disableSlot(@Valid @RequestBody DisableSlotRequest request) {
+        Long id = playingSlotService.disableSlot(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(id);
     }
 
    @GetMapping("/{slotId}/disabled")

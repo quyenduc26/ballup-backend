@@ -49,7 +49,6 @@ public class PlayingCenterController {
         return ResponseEntity.ok(slots);
     }
 
-
     
     @GetMapping
     public ResponseEntity<List<CardPlayingCenterResponse>> searchPlayingCenters(

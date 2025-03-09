@@ -75,6 +75,7 @@ public class TeamService {
         TeamMemberEntity teamMember = TeamMemberEntity.builder()
             .team(team)
             .user(user)
+            .role(Role.MEMBER)
             .build();
     
         teamMemberRepository.save(teamMember);
