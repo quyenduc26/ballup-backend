@@ -26,4 +26,8 @@ public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
 
     @Query("SELECT COUNT(b) FROM BookingEntity b WHERE b.bookingSlot.slot.playingCenter = :center")
     Long countByPlayingCenter(PlayingCenterEntity center);
+
+    @Query("SELECT b FROM BookingEntity b WHERE b.payment.creator.id = :userId")
+    List<BookingEntity> findBookingsByUserId(@Param("userId") Long userId);
+
 }

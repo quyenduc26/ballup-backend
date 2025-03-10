@@ -20,4 +20,6 @@ public class BookingDetailResponse {
     private Long amount;
     private BookingStatus status;
     private Timestamp bookingTime;
+    private Timestamp fromTime;
+    private Timestamp toTime;
 }

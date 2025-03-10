@@ -1,5 +1,7 @@
 package com.example.ballup_backend.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,13 +21,13 @@ public class BookingController {
     @Autowired
     private BookingService bookingService;
 
-    @PatchMapping("/{bookingId}/deposit/{amount}")
-    public ResponseEntity<String> depositBooking(@PathVariable Long bookingId, @PathVariable Long amount,  @RequestParam Long userId) {
-        bookingService.depositBookingRequest(bookingId, amount, userId);
+    @PatchMapping("/{bookingId}/deposit")
+    public ResponseEntity<String> depositBooking(@PathVariable Long bookingId) {
+        bookingService.depositBookingRequest(bookingId);
         return ResponseEntity.ok("Booking deposited successfully");
     }
 
-    @PatchMapping("/cancel")
+    @PatchMapping("/{bookingId}/cancel")
     public ResponseEntity<String> cancelBooking(@PathVariable Long bookingId) {
         bookingService.cancelBookingRequest(bookingId);
         return ResponseEntity.ok("Booking canceled successfully");
@@ -35,5 +37,11 @@ public class BookingController {
     public ResponseEntity<BookingDetailResponse> getBookingDetail(@PathVariable Long bookingId) {
         BookingDetailResponse bookingDetail = bookingService.getBookingDetail(bookingId);
         return ResponseEntity.ok(bookingDetail);
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<BookingDetailResponse>> getAllBookingsByUser(@PathVariable Long userId) {
+        List<BookingDetailResponse> bookings = bookingService.getAllBookingsByUser(userId);
+        return ResponseEntity.ok(bookings);
     }
 }

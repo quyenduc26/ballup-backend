@@ -61,9 +61,9 @@ public class BookingService {
     public void cancelBookingRequest(Long bookingId) {
         BookingEntity booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
-        if (booking.getStatus() != BookingEntity.BookingStatus.REQUESTED) {
-            throw new RuntimeException("Booking is not in REQUESTED status");
-        }
+        if (booking.getStatus() != BookingEntity.BookingStatus.REQUESTED && booking.getStatus() != BookingEntity.BookingStatus.CONFIRMED) {
+            throw new RuntimeException("Booking is not in REQUESTED or CONFIRMED status");
+        }   
         booking.setStatus(BookingEntity.BookingStatus.CANCEL);
         bookingRepository.save(booking);
     }
@@ -98,11 +98,10 @@ public class BookingService {
     }
 
     @Transactional
-    public void depositBookingRequest(Long bookingId, Long amount, Long userId) {
+    public void depositBookingRequest(Long bookingId) {
 
         //check valid
         BookingEntity booking = bookingRepository.getReferenceById(bookingId);
-        UserEntity user = userRepository.getReferenceById(userId);
         if (booking.getStatus() != BookingEntity.BookingStatus.CONFIRMED) {
             throw new RuntimeException("Booking is not in CONFIRMED status");
         }
@@ -111,13 +110,8 @@ public class BookingService {
         UnavailableSlotEntity unavailableSlot = unavailableSlotRepository.getReferenceById(booking.getBookingSlot().getId());
         unavailableSlot.setStatus(Status.PROCESSING);
         unavailableSlotRepository.save(unavailableSlot); 
-
-        //tạo payment cho booking
-        PaymentEntity bookingPayment = paymentRepository.getReferenceById(booking.getPayment().getId());
-        if( bookingPayment.getId() == user.getId()) bookingPayment.setCreator(user);
         
         //save 
-        paymentRepository.save(bookingPayment);
         booking.setStatus(BookingEntity.BookingStatus.DEPOSITED);
         bookingRepository.save(booking);
     }
@@ -188,10 +182,34 @@ public class BookingService {
                         .centerName(booking.getBookingSlot().getSlot().getPlayingCenter().getName())
                         .centerAddress(booking.getBookingSlot().getSlot().getPlayingCenter().getAddress())
                         .bookingTime(booking.getCreatedAt())
+                        .fromTime(booking.getBookingSlot().getFromTime())
+                        .toTime(booking.getBookingSlot().getToTime())
                         .status(booking.getStatus())
                         .build()
                 )
                 .orElseThrow(() -> new EntityNotFoundException("Booking not found with id: " + bookingId));
+    }
+    
+    public List<BookingDetailResponse> getAllBookingsByUser(Long userId) {
+        UserEntity user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+    
+        List<BookingEntity> userBookings = bookingRepository.findBookingsByUserId(userId);
+    
+        return userBookings.stream()
+            .map(booking -> BookingDetailResponse.builder()
+                    .bookingId(booking.getId())
+                    .user(booking.getPayment().getCreator().getUsername())
+                    .amount(booking.getPayment().getAmount())
+                    .slotName(booking.getBookingSlot().getSlot().getName())
+                    .centerName(booking.getBookingSlot().getSlot().getPlayingCenter().getName())
+                    .centerAddress(booking.getBookingSlot().getSlot().getPlayingCenter().getAddress())
+                    .bookingTime(booking.getCreatedAt())
+                    .fromTime(booking.getBookingSlot().getFromTime())
+                    .toTime(booking.getBookingSlot().getToTime())
+                    .status(booking.getStatus())
+                    .build()
+            ).collect(Collectors.toList());
     }
     
 }
