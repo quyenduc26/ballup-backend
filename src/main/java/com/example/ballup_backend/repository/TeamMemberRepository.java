@@ -46,5 +46,8 @@ public interface TeamMemberRepository extends JpaRepository<TeamMemberEntity, Lo
     @Query("SELECT COUNT(tm) > 0 FROM TeamMemberEntity tm WHERE tm.user.id = :userId AND tm.team.sport = :sport")
     boolean existsByUserIdAndTeamSport(@Param("userId") Long userId, @Param("sport") Sport sport);
 
+    @Query("SELECT tm.team FROM TeamMemberEntity tm WHERE tm.user.id = :userId AND tm.team.sport = :sportType")
+    TeamEntity findTeamByUserIdAndSport(@Param("userId") Long userId, @Param("sportType") Sport sportType);
+
 }
 

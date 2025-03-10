@@ -1,6 +1,5 @@
 package com.example.ballup_backend.dto.req.game;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 import com.example.ballup_backend.entity.GameEntity.GameType;

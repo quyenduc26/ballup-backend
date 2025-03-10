@@ -2,6 +2,7 @@ package com.example.ballup_backend.service;
 
 import com.example.ballup_backend.dto.req.team.KickTeamMemberRequest;
 import com.example.ballup_backend.dto.req.team.UpdateMemberRoleRequest;
+import com.example.ballup_backend.dto.res.team.TeamOverviewResponse;
 import com.example.ballup_backend.entity.TeamEntity;
 import com.example.ballup_backend.entity.TeamEntity.Sport;
 import com.example.ballup_backend.entity.TeamMemberEntity;
@@ -98,5 +99,22 @@ public class TeamMemberService {
         Long teamId = teamMemberRepository.findTeamsByUserIdAndSport(userId, sport);
         return teamMemberRepository.findAllMemberIdsByTeamId(teamId);
     }
+
+    public TeamOverviewResponse getTeamByUserIdAndSport(Long userId, Sport sport) {
+        TeamEntity team = teamMemberRepository.findTeamByUserIdAndSport(userId, sport);
+    
+        if (team == null) {
+            throw new RuntimeException("Team not found for userId: " + userId + " and sport: " + sport);
+        }
+        return TeamOverviewResponse.builder()
+            .id(team.getId())
+            .name(team.getName())
+            .logo(team.getLogo())
+            .cover(team.getCover()) 
+            .sport(team.getSport())
+            .totalMembers(teamMemberRepository.countByTeamId(team.getId())) 
+            .build();
+    }
+    
 
 }

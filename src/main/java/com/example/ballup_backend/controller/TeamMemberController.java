@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.ballup_backend.dto.req.team.KickTeamMemberRequest;
 import com.example.ballup_backend.dto.req.team.UpdateMemberRoleRequest;
+import com.example.ballup_backend.dto.res.team.TeamOverviewResponse;
 import com.example.ballup_backend.entity.TeamMemberEntity;
 import com.example.ballup_backend.entity.TeamEntity.Sport;
 import com.example.ballup_backend.entity.TeamMemberEntity.Role;
@@ -56,5 +57,9 @@ public class TeamMemberController {
         return ResponseEntity.ok(teamMemberService.getTeamMemberIds(userId, sport));
     }
 
+    @GetMapping("/{userId}/team")
+    public ResponseEntity<TeamOverviewResponse> getTeamByUserIdAndSport( @PathVariable Long userId,  @RequestParam Sport sport) {
+        return ResponseEntity.ok(teamMemberService.getTeamByUserIdAndSport(userId, sport));
+    }
 
 }
