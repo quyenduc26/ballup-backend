@@ -3,8 +3,10 @@ package com.example.ballup_backend.controller;
 import com.example.ballup_backend.dto.req.team.CreateTeamRequest;
 import com.example.ballup_backend.dto.req.team.UpdateTeamRequest;
 import com.example.ballup_backend.dto.res.team.TeamDetailResponse;
+import com.example.ballup_backend.dto.res.team.TeamOverviewResponse;
 import com.example.ballup_backend.dto.res.team.TeamResponse;
 import com.example.ballup_backend.entity.TeamEntity;
+import com.example.ballup_backend.entity.TeamEntity.Sport;
 import com.example.ballup_backend.service.TeamService;
 
 import java.util.List;
@@ -63,5 +65,10 @@ public class TeamController {
     public ResponseEntity<String> deleteTeam( @PathVariable Long teamId, @RequestParam Long userId) {
         teamService.deleteTeam(teamId, userId);
         return ResponseEntity.ok("Team deleted successfully");
+    }
+
+    @GetMapping("/{teamId}/overview")
+    public ResponseEntity<TeamOverviewResponse> getTeamByUserIdAndSport( @PathVariable Long teamId) {
+        return ResponseEntity.ok(teamService.getTeamOverview(teamId));
     }
 }

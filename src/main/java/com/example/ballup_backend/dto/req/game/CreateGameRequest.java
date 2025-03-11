@@ -15,6 +15,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateGameRequest {
     Long userId;
+    Long userTeamId;
     String name;
     Long fromTime;
     Long toTime;
