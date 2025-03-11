@@ -1,13 +1,15 @@
 package com.example.ballup_backend.service;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.ballup_backend.dto.req.game.CreateGameRequest;
+import com.example.ballup_backend.dto.res.game.MyGameResponse;
+import com.example.ballup_backend.dto.res.team.TeamOverviewResponse;
 import com.example.ballup_backend.entity.BookingEntity;
 import com.example.ballup_backend.entity.BookingEntity.BookingStatus;
 import com.example.ballup_backend.entity.ConversationEntity;
@@ -20,6 +22,7 @@ import com.example.ballup_backend.entity.UnavailableSlotEntity.Status;
 import com.example.ballup_backend.entity.UnavailableSlotEntity.createdBy;
 import com.example.ballup_backend.repository.BookingRepository;
 import com.example.ballup_backend.repository.ConversationRepository;
+import com.example.ballup_backend.repository.GamePlayerRepository;
 import com.example.ballup_backend.repository.GameRepository;
 import com.example.ballup_backend.repository.PlayingSlotRepository;
 import com.example.ballup_backend.repository.UnavailableSlotRepository;
@@ -33,6 +36,9 @@ public class GameService {
     private GameRepository gameRepository;
 
     @Autowired
+    private GamePlayerRepository gamePlayerRepository;
+
+    @Autowired
     private UserRepository userRepository;
 
     @Autowired
@@ -43,6 +49,9 @@ public class GameService {
 
     @Autowired
     private GamePlayerService gamePlayerService;
+
+    @Autowired
+    private TeamService teamService;
 
     @Autowired
     private UnavailableSlotService unavailableSlotService;
@@ -125,9 +134,41 @@ public class GameService {
         }
         GameEntity savedGame =  gameRepository.save(game);
         
-        gamePlayerService.addPlayersToGame(savedGame.getId(), GameTeam.TEAMA, request.getMemberIdList());
+        gamePlayerService.addPlayersToGame(savedGame.getId(), request.getUserTeamId(), GameTeam.TEAMA, request.getMemberIdList());
     }
 
-    
-    
+    @Transactional
+    public List<MyGameResponse> getMyGames(Long userId) {
+        UserEntity user = userRepository.getReferenceById(userId);
+        
+        List<GameEntity> games = gamePlayerRepository.findGamesByUser(user);
+        
+        return games.stream()
+            .map(game -> {
+                // Lấy danh sách teamId theo gameId
+                List<Long> teamIds = gamePlayerRepository.findTeamIdsByGameId(game.getId());
+
+                // Lấy thông tin overview của từng team
+                TeamOverviewResponse teamA = teamIds.size() > 0 ? teamService.getTeamOverview(teamIds.get(0)) : null;
+                TeamOverviewResponse teamB = teamIds.size() > 1 ? teamService.getTeamOverview(teamIds.get(1)) : null;
+
+                return MyGameResponse.builder()
+                    .id(game.getId())
+                    .name(game.getName())
+                    .fromTime(game.getFromTime())
+                    .toTime(game.getToTime())
+                    .center(game.getLocation())
+                    .cover(game.getCover())
+                    .type(game.getType())
+                    .conversationId(game.getConversation().getId())
+                    .slotId(game.getPlayingSlot() != null ? game.getPlayingSlot().getId() : null)
+                    .isCreator(game.getCreator().getId().equals(user.getId()))
+                    .teamA(teamA)
+                    .teamB(teamB)
+                    .build();
+            })
+            .collect(Collectors.toList());
+    }
+
+
 }

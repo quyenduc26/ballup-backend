@@ -27,9 +27,13 @@ public class GamePlayerEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
+    @ManyToOne
+    @JoinColumn(name = "team_id", nullable = false)
+    private TeamEntity joinedTeam;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "team", nullable = false)
-    private GameTeam team;
+    private GameTeam gameTeam;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
