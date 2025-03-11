@@ -156,11 +156,11 @@ public class TeamService {
     public void updateTeam(Long teamId, UpdateTeamRequest request) {
         TeamEntity team = teamRepository.getReferenceById(teamId); 
 
-        if (request.getName() != null) team.setName(request.getName());
-        if (request.getAddress() != null) team.setAddress(request.getAddress());
-        if (request.getIntro() != null) team.setIntro(request.getIntro());
-        if (request.getLogo() != null) team.setLogo(request.getLogo());
-        if (request.getCover() != null) team.setCover(request.getCover());
+        if (request.getName() != null && !request.getName().equals("")) team.setName(request.getName());
+        if (request.getAddress() != null && !request.getAddress().equals("")) team.setAddress(request.getAddress());
+        if (request.getIntro() != null && !request.getIntro().equals("")) team.setIntro(request.getIntro());
+        if (request.getLogo() != null && !request.getLogo().equals("")) team.setLogo(request.getLogo());
+        if (request.getCover() != null && !request.getCover().equals("")) team.setCover(request.getCover());
 
         teamRepository.save(team);
     }

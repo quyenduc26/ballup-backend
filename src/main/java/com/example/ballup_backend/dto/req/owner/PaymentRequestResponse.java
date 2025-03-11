@@ -14,7 +14,6 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PaymentRequestResponse {
     Long id;
-    Long bookingId;
     Long amount;
     String creator;
     Timestamp createdAt;

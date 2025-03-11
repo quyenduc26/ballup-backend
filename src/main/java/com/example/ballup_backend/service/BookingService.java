@@ -71,7 +71,7 @@ public class BookingService {
     public void rejectBookingRequest(Long bookingId) {
         BookingEntity booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
-        if (booking.getStatus() != BookingEntity.BookingStatus.REQUESTED) {
+        if (booking.getStatus() != BookingEntity.BookingStatus.REQUESTED && booking.getStatus() != BookingEntity.BookingStatus.DEPOSITED) {
             throw new RuntimeException("Booking is not in REQUESTED status");
         }
         booking.setStatus(BookingEntity.BookingStatus.REJECTED);
@@ -165,7 +165,6 @@ public class BookingService {
                 .id(booking.getId())
                 .creator(booking.getBookingSlot().getCreator().getUsername())
                 .amount(booking.getPayment().getAmount())
-                .bookingId(booking.getId())
                 .createdAt(booking.getPayment().getCreatedAt())
                 .build()
         ).collect(Collectors.toList());

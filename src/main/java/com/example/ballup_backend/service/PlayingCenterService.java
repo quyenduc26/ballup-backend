@@ -104,6 +104,7 @@ public class PlayingCenterService {
                 .address(center.getAddress())
                 .imageUrls(imageUrls)
                 .slots(slotResponses)
+                .sport(center.getType())
                 .build();
         }).collect(Collectors.toList());
     }
