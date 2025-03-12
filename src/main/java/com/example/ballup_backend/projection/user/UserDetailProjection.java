@@ -16,5 +16,4 @@ public class UserDetailProjection {
     String username;
     String email;
     Role role;
-    
 }

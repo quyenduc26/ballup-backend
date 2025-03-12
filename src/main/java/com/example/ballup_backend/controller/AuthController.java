@@ -66,6 +66,11 @@ public class AuthController {
         return ResponseEntity.ok(Map.of("message", "No authentication found"));
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<LoginResponse> logout(@Valid @RequestBody LoginRequest request) {
+        return ResponseEntity.ok(authService.loginUser(request));
+    }
+
 
     
 }
