@@ -16,7 +16,8 @@ public enum ErrorCodeEnum {
     USER_NOT_IN_TEAM(1008, "Member does not belong to the specified team"),
     FORBIDDEN(1009, "Don't have permission"),
     CANNOT_KICK_SELF(1009, "Can not kick your self"),
-    MEMBER_NOT_FOUND(1010, "Team member not found")
+    MEMBER_NOT_FOUND(1010, "Team member not found"),
+    INVALID_PASSWORD(10011, "Invalid password"),
 
     ;
 

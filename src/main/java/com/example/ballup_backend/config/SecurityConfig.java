@@ -65,10 +65,11 @@ public class SecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
+    @Bean(name = "passwordEncoder")
+    public static PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 }
 
 

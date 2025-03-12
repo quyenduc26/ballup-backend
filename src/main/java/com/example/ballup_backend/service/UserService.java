@@ -2,8 +2,10 @@ package com.example.ballup_backend.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.ballup_backend.dto.req.user.ChangePasswordRequest;
 import com.example.ballup_backend.dto.req.user.UserInfoUpdateRequest;
 import com.example.ballup_backend.dto.res.user.UserInfoResponse;
 import com.example.ballup_backend.entity.UserEntity;
@@ -18,6 +20,9 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository; 
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public UserDetailProjection getAuthenticatedUser(String username) {
         UserEntity user = userRepository.findByUsername(username)
@@ -60,6 +65,17 @@ public class UserService {
         if (request.getWeight() != null) user.setWeight(request.getWeight());
         if (request.getHeight() != null) user.setHeight(request.getHeight());
 
+        userRepository.save(user);
+    }
+
+    public void changePassword(Long userId, ChangePasswordRequest changePasswordRequest) {
+        UserEntity user = userRepository.findById(userId)
+            .orElseThrow(() -> new BaseException(ErrorCodeEnum.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
+
+        if (!passwordEncoder.matches(changePasswordRequest.getOldPassword(), user.getPassword())) {
+            throw new BaseException(ErrorCodeEnum.INVALID_PASSWORD, HttpStatus.BAD_REQUEST);
+        }
+        user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
         userRepository.save(user);
     }
 }
