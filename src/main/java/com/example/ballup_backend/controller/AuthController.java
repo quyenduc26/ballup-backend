@@ -20,6 +20,7 @@ import com.example.ballup_backend.dto.res.user.LoginResponse;
 import com.example.ballup_backend.service.AuthService;
 
 import io.jsonwebtoken.io.IOException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
@@ -65,6 +66,13 @@ public class AuthController {
         }
         return ResponseEntity.ok(Map.of("message", "No authentication found"));
     } 
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletRequest request) {
+        request.getSession().invalidate(); 
+        return ResponseEntity.ok("Logged out successfully");
+    }
+
 
 
 }
