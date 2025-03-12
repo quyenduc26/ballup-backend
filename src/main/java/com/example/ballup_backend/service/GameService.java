@@ -5,16 +5,21 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.example.ballup_backend.dto.req.game.CreateGameRequest;
+import com.example.ballup_backend.dto.res.game.GameResponse;
 import com.example.ballup_backend.dto.res.game.MyGameResponse;
+import com.example.ballup_backend.dto.res.team.GameTeamMemberResponse;
+import com.example.ballup_backend.dto.res.team.GameTeamResponse;
 import com.example.ballup_backend.dto.res.team.TeamOverviewResponse;
 import com.example.ballup_backend.entity.BookingEntity;
 import com.example.ballup_backend.entity.BookingEntity.BookingStatus;
 import com.example.ballup_backend.entity.ConversationEntity;
 import com.example.ballup_backend.entity.GameEntity;
 import com.example.ballup_backend.entity.PlayingSlotEntity;
+import com.example.ballup_backend.entity.TeamEntity;
 import com.example.ballup_backend.entity.UnavailableSlotEntity;
 import com.example.ballup_backend.entity.UserEntity;
 import com.example.ballup_backend.entity.GamePlayerEntity.GameTeam;
@@ -25,8 +30,11 @@ import com.example.ballup_backend.repository.ConversationRepository;
 import com.example.ballup_backend.repository.GamePlayerRepository;
 import com.example.ballup_backend.repository.GameRepository;
 import com.example.ballup_backend.repository.PlayingSlotRepository;
+import com.example.ballup_backend.repository.TeamMemberRepository;
+import com.example.ballup_backend.repository.TeamRepository;
 import com.example.ballup_backend.repository.UnavailableSlotRepository;
 import com.example.ballup_backend.repository.UserRepository;
+import com.example.ballup_backend.specification.GameSpecification;
 
 import jakarta.transaction.Transactional;
 
@@ -39,7 +47,13 @@ public class GameService {
     private GamePlayerRepository gamePlayerRepository;
 
     @Autowired
+    private TeamRepository teamRepository;
+
+    @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private TeamMemberRepository teamMemberRepository;
 
     @Autowired
     private PlayingSlotRepository slotRepository;
@@ -112,7 +126,7 @@ public class GameService {
                 .creator(creator)
                 .fromTime(fromTimestamp)
                 .toTime(toTimestamp)
-                .location(request.getLocation())
+                .address(request.getLocation())
                 .description(request.getDescription())
                 .type(request.getType())
                 .conversation(conversation)
@@ -125,7 +139,7 @@ public class GameService {
             .creator(creator)
             .fromTime(fromTimestamp)
             .toTime(toTimestamp)
-            .location(request.getLocation())
+            .address(request.getLocation())
             .description(request.getDescription())
             .type(request.getType())
             .conversation(conversation)
@@ -157,7 +171,7 @@ public class GameService {
                     .name(game.getName())
                     .fromTime(game.getFromTime())
                     .toTime(game.getToTime())
-                    .center(game.getLocation())
+                    .center(game.getAddress())
                     .cover(game.getCover())
                     .type(game.getType())
                     .conversationId(game.getConversation().getId())
@@ -170,5 +184,57 @@ public class GameService {
             .collect(Collectors.toList());
     }
 
+   @Transactional
+    public List<GameResponse> getGamesWithOnlyTeamA(String name, String address, String sport) {
+        // Tạo specification để lọc game theo điều kiện
+        Specification<GameEntity> spec = GameSpecification.filterGames(name, address, sport);
 
-}
+        // Lấy danh sách game theo filter
+        List<GameEntity> allGames = gameRepository.findAll(spec);
+        List<GameResponse> resultList;
+
+        // Lọc ra các game chỉ có teamA
+        List<GameEntity> filteredGames = allGames.stream()
+            .filter(game -> {
+                List<Long> teamIds = gamePlayerRepository.findTeamIdsByGameId(game.getId());
+                return teamIds.size() == 1; // Chỉ có duy nhất teamA
+            })
+            .collect(Collectors.toList());
+
+            resultList = filteredGames.stream().map(game -> {
+                List<Long> teamIds = gamePlayerRepository.findTeamIdsByGameId(game.getId());
+                TeamEntity team = teamRepository.getReferenceById(teamIds.get(0));
+                List<UserEntity> teamMembers = teamMemberRepository.findUsersByTeamId(team.getId());
+                List<GameTeamMemberResponse> memberResponses = teamMembers.stream()
+                    .map(user -> GameTeamMemberResponse.builder()
+                        .avatar(user.getAvatar())
+                        .firstName(user.getFirstName())
+                        .lastName(user.getLastName())
+                        .build())
+                    .collect(Collectors.toList());
+                GameTeamResponse teamA = GameTeamResponse.builder()
+                    .name(team.getName())
+                    .intro(team.getIntro())
+                    .logo(team.getLogo())
+                    .members(memberResponses)
+                    .build();
+
+
+                return GameResponse.builder()
+                .id(game.getId())
+                    .name(game.getName())
+                    .fromTime(game.getFromTime())
+                    .toTime(game.getToTime())
+                    .cover(game.getCover())
+                    .type(game.getType())
+                    .conversationId(game.getConversation().getId())
+                    .slotId(game.getPlayingSlot() != null ? game.getPlayingSlot().getId() : null)
+                    .centerName(game.getPlayingSlot() != null ? game.getPlayingSlot().getPlayingCenter().getName() : null)
+                    .slotName(game.getPlayingSlot() != null ? game.getPlayingSlot().getName() : null)
+                    .teamA(teamA)
+                    .build();
+            }).collect(Collectors.toList());
+
+            return resultList;
+        }
+    }
