@@ -10,9 +10,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.ballup_backend.dto.req.game.CreateGameRequest;
+import com.example.ballup_backend.dto.res.game.GameResponse;
 import com.example.ballup_backend.dto.res.game.MyGameResponse;
 import com.example.ballup_backend.service.GameService;
 
@@ -35,5 +37,14 @@ public class GameController {
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<MyGameResponse>> getUserGame(@PathVariable Long userId) {
         return ResponseEntity.status(HttpStatus.OK).body(gameService.getMyGames(userId));
+    }
+
+    @GetMapping()
+    public ResponseEntity<List<GameResponse>> getGamesWithOnlyTeamA(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String address,
+            @RequestParam(required = false) String sport) {
+        List<GameResponse> games = gameService.getGamesWithOnlyTeamA(name, address, sport);
+        return ResponseEntity.ok(games);
     }
 }
