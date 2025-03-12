@@ -26,7 +26,7 @@ public class UserEntity {
     @Column(name = "email", nullable = false, length = 100, unique = true) 
     private String email;
 
-    @Column(name = "phone", nullable = false, length = 100, unique = true) 
+    @Column(name = "phone", nullable = true, length = 100, unique = true) 
     private String phone;
 
     @Column(name = "first_name", nullable = true, length = 100)

@@ -3,6 +3,7 @@ package com.example.ballup_backend.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.ballup_backend.dto.req.user.ChangePasswordRequest;
 import com.example.ballup_backend.dto.req.user.UserInfoUpdateRequest;
 import com.example.ballup_backend.dto.res.user.UserInfoResponse;
 import com.example.ballup_backend.service.UserService;
@@ -33,14 +34,9 @@ public class UserController {
         return ResponseEntity.ok("User information updated successfully!");
     }
 
-    // @PatchMapping
-    // public ResponseEntity<String> changePassword() {
-    //     return ResponseEntity.ok("Hello admin check");
-    // }
-
-    // @DeleteMapping
-    // public ResponseEntity<String> deleteAccount() {
-    //     return ResponseEntity.ok("Hello admin check");
-    // }
-    
+    @PatchMapping("{userId}/change")
+    public ResponseEntity<String> changePassword(@PathVariable Long userId, @RequestBody ChangePasswordRequest changePasswordRequest) {
+        userService.changePassword(userId, changePasswordRequest);
+        return ResponseEntity.ok("Password changed successfully!");
+    }
 }

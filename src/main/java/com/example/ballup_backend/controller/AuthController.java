@@ -30,7 +30,7 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
-   @PostMapping("/register")
+    @PostMapping("/register")
     public ResponseEntity<String> register(@Valid @RequestBody RegisterRequest request) {
         authService.registerUser(request);
         return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully!");
@@ -64,13 +64,7 @@ public class AuthController {
             );
         }
         return ResponseEntity.ok(Map.of("message", "No authentication found"));
-    }
-
-    @PostMapping("/logout")
-    public ResponseEntity<LoginResponse> logout(@Valid @RequestBody LoginRequest request) {
-        return ResponseEntity.ok(authService.loginUser(request));
-    }
+    } 
 
 
-    
 }
