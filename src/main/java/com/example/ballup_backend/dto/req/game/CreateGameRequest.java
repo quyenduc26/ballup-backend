@@ -21,7 +21,8 @@ public class CreateGameRequest {
     Long toTime;
     String location;
     String description;
-    String cover;
+    String cover; 
+    Integer membersRequired;
     List<Long> memberIdList;
     GameType type;
     @Builder.Default Long slotId = null;

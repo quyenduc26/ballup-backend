@@ -32,7 +32,7 @@ public class BookingEntity {
     private PaymentEntity payment;
 
     @OneToOne
-    @JoinColumn(name = "unavailable_slot_id", unique = true, nullable = true)
+    @JoinColumn(name = "unavailable_slot_id", nullable = false)
     private UnavailableSlotEntity bookingSlot;
 
     @CreationTimestamp
