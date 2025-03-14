@@ -69,7 +69,6 @@ public class PlayingSlotService {
     }
 
     public Long disableSlot(DisableSlotRequest request) {
-
         Timestamp fromTimestamp = new Timestamp(request.getFromTime());
         Timestamp toTimestamp = new Timestamp(request.getToTime());
  

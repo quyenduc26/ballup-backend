@@ -33,7 +33,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .cors(Customizer.withDefaults())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/login", "/auth/register", "/auth/google", "/auth/google/callback").permitAll()
+                .requestMatchers("/auth/login", "/auth/register", "/auth/google", "/auth/google/callback", "/ws/**").permitAll()
                 .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN") 
                 .requestMatchers("/owner/**").hasAuthority("ROLE_OWNER") 
                 .requestMatchers("/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN", "ROLE_OWNER")

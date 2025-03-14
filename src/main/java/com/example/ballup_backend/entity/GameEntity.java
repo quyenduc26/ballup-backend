@@ -32,10 +32,13 @@ public class GameEntity {
     @Column(name = "address", nullable = false)
     private String address; 
 
-    @Column(name = "description", nullable = false)
+    @Column(name = "description", nullable = true)
     private String description; 
 
-    @Column(name = "cover", nullable = false)
+    @Column(name = "members_required", nullable = true)
+    private Integer membersRequired; 
+
+    @Column(name = "cover", nullable = true)
     private String cover; 
 
     @CreationTimestamp
@@ -49,6 +52,10 @@ public class GameEntity {
     @OneToOne
     @JoinColumn(name = "conversation_id", unique = true, nullable = true)
     private ConversationEntity conversation;
+
+    @OneToOne
+    @JoinColumn(name = "booking_id", nullable = true)
+    private BookingEntity booking;
 
     @ManyToOne
     @JoinColumn(name = "playing_slot_id", nullable = true)

@@ -41,7 +41,7 @@ public class UserEntity {
     @Column(name = "google_id", nullable = true, length = 255)
     private String googleId;
 
-    @Column(name = "avatar", nullable = true, length = 255 )
+    @Column(name = "avatar", nullable = true,  columnDefinition = "TEXT" )
     private String avatar;
 
     @Column(name = "weight", nullable = true)
