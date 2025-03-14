@@ -1,7 +1,7 @@
 package com.example.ballup_backend.dto.res.game;
 
 import com.example.ballup_backend.dto.res.team.GameTeamResponse;
-import com.example.ballup_backend.entity.GameEntity.GameType;
+import com.example.ballup_backend.entity.TeamEntity.SportType;
 
 import io.micrometer.common.lang.Nullable;
 import lombok.AllArgsConstructor;
@@ -25,7 +25,7 @@ public class GameResponse {
     private Timestamp fromTime;
     private Timestamp toTime;
     private String cover;
-    private GameType type;
+    private SportType type;
     private Long conversationId;
     private Long slotId;
 

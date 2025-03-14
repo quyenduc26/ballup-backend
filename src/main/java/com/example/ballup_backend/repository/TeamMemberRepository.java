@@ -1,7 +1,7 @@
 package com.example.ballup_backend.repository;
 
 import com.example.ballup_backend.entity.TeamEntity;
-import com.example.ballup_backend.entity.TeamEntity.Sport;
+import com.example.ballup_backend.entity.TeamEntity.SportType;
 import com.example.ballup_backend.entity.TeamMemberEntity;
 import com.example.ballup_backend.entity.UserEntity;
 
@@ -41,13 +41,13 @@ public interface TeamMemberRepository extends JpaRepository<TeamMemberEntity, Lo
     List<Long> findAllMemberIdsByTeamId(@Param("teamId") Long teamId);
 
     @Query("SELECT tm.team.id FROM TeamMemberEntity tm WHERE tm.user.id = :userId AND tm.team.sport = :sportType")
-    Long findTeamsByUserIdAndSport(@Param("userId") Long userId, @Param("sportType") Sport sportType);
+    Long findTeamsByUserIdAndSportType(@Param("userId") Long userId, @Param("sportType") SportType sportType);
 
     @Query("SELECT COUNT(tm) > 0 FROM TeamMemberEntity tm WHERE tm.user.id = :userId AND tm.team.sport = :sport")
-    boolean existsByUserIdAndTeamSport(@Param("userId") Long userId, @Param("sport") Sport sport);
+    boolean existsByUserIdAndTeamSportType(@Param("userId") Long userId, @Param("sport") SportType sport);
 
     @Query("SELECT tm.team FROM TeamMemberEntity tm WHERE tm.user.id = :userId AND tm.team.sport = :sportType")
-    TeamEntity findTeamByUserIdAndSport(@Param("userId") Long userId, @Param("sportType") Sport sportType);
+    TeamEntity findTeamByUserIdAndSportType(@Param("userId") Long userId, @Param("sportType") SportType sportType);
 
 }
 

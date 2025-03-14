@@ -2,7 +2,7 @@ package com.example.ballup_backend.dto.req.center;
 
 import java.util.List;
 
-import com.example.ballup_backend.entity.PlayingCenterEntity.PlayingCenterType;
+import com.example.ballup_backend.entity.TeamEntity.SportType;
 
 import jakarta.validation.constraints.*;
 import lombok.Builder;
@@ -26,7 +26,6 @@ public class UpdateCenterRequest {
     private List<String> images;
 
     @NotEmpty 
-    private PlayingCenterType type;
+    private SportType type;
 
-    private PlayingCenterType centerType;
 }

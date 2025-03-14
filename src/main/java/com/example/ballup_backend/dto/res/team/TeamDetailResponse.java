@@ -18,7 +18,7 @@ public class TeamDetailResponse {
     private String intro;
     private String logo;
     private String cover;
-    private TeamEntity.Sport sport;
+    private TeamEntity.SportType sport;
     private boolean isOwner;
     private List<TeamMemberResponse> members;
 }

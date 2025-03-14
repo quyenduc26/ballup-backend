@@ -17,10 +17,10 @@ import com.example.ballup_backend.dto.res.center.CardPlayingCenterResponse;
 import com.example.ballup_backend.dto.res.center.PlayingCenterResponse;
 import com.example.ballup_backend.dto.res.slot.PlayingSlotResponse;
 import com.example.ballup_backend.entity.PlayingCenterEntity;
-import com.example.ballup_backend.entity.PlayingCenterEntity.PlayingCenterType;
 import com.example.ballup_backend.entity.PlayingCenterImageEntity;
 import com.example.ballup_backend.entity.PlayingSlotEntity;
 import com.example.ballup_backend.entity.UserEntity;
+import com.example.ballup_backend.entity.TeamEntity.SportType;
 import com.example.ballup_backend.repository.BookingRepository;
 import com.example.ballup_backend.repository.PlayingCenterImageRepository;
 import com.example.ballup_backend.repository.PlayingCenterRepository;
@@ -85,17 +85,17 @@ public class PlayingCenterService {
         List<PlayingCenterEntity> centers = playingCenterRepository.findByOwner(owner);
     
         return centers.stream().map(center -> {
-            List<String> imageUrls = playingCenterImageRepository.findByCenter(center).stream()
+                List<String> imageUrls = playingCenterImageRepository.findByCenter(center).stream()
                     .map(PlayingCenterImageEntity::getImage)
                     .collect(Collectors.toList());
-        List<PlayingSlotResponse> slotResponses = playingSlotRepository.findSlotsByCenter(center).stream()
-        .map(slot -> PlayingSlotResponse.builder()
-                .id(slot.getId())
-                .name(slot.getName())
-                .primaryPrice(slot.getPrimaryPrice())
-                .nightPrice(slot.getNightPrice())
-                .build())
-        .collect(Collectors.toList());
+                List<PlayingSlotResponse> slotResponses = playingSlotRepository.findSlotsByCenter(center).stream()
+                .map(slot -> PlayingSlotResponse.builder()
+                        .id(slot.getId())
+                        .name(slot.getName())
+                        .primaryPrice(slot.getPrimaryPrice())
+                        .nightPrice(slot.getNightPrice())
+                        .build())
+                .collect(Collectors.toList());
 
             return PlayingCenterResponse.builder()
                 .id(center.getId())
@@ -187,7 +187,7 @@ public class PlayingCenterService {
             spec = spec.and(PlayingCenterSpecification.filterByAddress(address));
         }
         if (sport != null && !sport.isEmpty()) {
-                PlayingCenterType sportEnum = PlayingCenterType.valueOf(sport.toUpperCase());
+                SportType sportEnum = SportType.valueOf(sport.toUpperCase());
                 spec = spec.and(PlayingCenterSpecification.filterBySport(sportEnum));
         }
 

@@ -23,6 +23,7 @@ import com.example.ballup_backend.entity.BookingEntity.BookingStatus;
 import com.example.ballup_backend.entity.ConversationEntity;
 import com.example.ballup_backend.entity.ConversationMemberEntity;
 import com.example.ballup_backend.entity.GameEntity;
+import com.example.ballup_backend.entity.GamePlayerEntity;
 import com.example.ballup_backend.entity.PaymentEntity;
 import com.example.ballup_backend.entity.PlayingSlotEntity;
 import com.example.ballup_backend.entity.TeamEntity;
@@ -373,5 +374,57 @@ public class GameService {
         gameRepository.save(game);
     }
     
+    @Transactional
+    public void joinGame(Long gameId, Long userId) {
+        GameEntity game = gameRepository.findById(gameId)
+            .orElseThrow(() -> new RuntimeException("Game not found"));
+
+        UserEntity user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+        GamePlayerEntity gamePlayer = GamePlayerEntity.builder()
+            .game(game)
+            .user(user)
+            .gameTeam(GameTeam.TEAMB) 
+            .build();
+        gamePlayerRepository.save(gamePlayer);
+
+        ConversationMemberEntity joinedMember = ConversationMemberEntity.builder()
+            .conversation(game.getConversation())
+            .user(user)
+            .build();
+        conversationMemberRepository.save(joinedMember);
+    }
+
+    @Transactional
+    public void joinGameAsTeam(Long gameId, Long userId) {
+        GameEntity game = gameRepository.findById(gameId)
+            .orElseThrow(() -> new RuntimeException("Game not found"));
+
+        UserEntity user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("Team not found"));
+
+        TeamEntity teamMembers = teamMemberRepository.findTeamByUserIdAndSportType(userId, game.getType());
+        List<Long> teamMemberIds = teamMemberRepository.findAllMemberIdsByTeamId(teamMembers.getId());
+
+        for (Long id : teamMemberIds) {
+            UserEntity member = userRepository.getReferenceById(id);
+            boolean isAlreadyJoined = gamePlayerRepository.existsByGameAndUser(game, member);
+            if (!isAlreadyJoined) {
+                GamePlayerEntity gamePlayer = GamePlayerEntity.builder()
+                    .game(game)
+                    .user(member)
+                    .gameTeam(GameTeam.TEAMB) 
+                    .build();
+                gamePlayerRepository.save(gamePlayer);
+                
+                ConversationMemberEntity joinedMember = ConversationMemberEntity.builder()
+                    .conversation(game.getConversation())
+                    .user(member)
+                    .build();
+                conversationMemberRepository.save(joinedMember);
+            }
+        }
+    }
 
 }

@@ -32,7 +32,7 @@ public class GamePlayerService {
 
     @Transactional
     public void addPlayersToGame(Long gameId, Long userTeamId, GamePlayerEntity.GameTeam gameTeam, List<Long> playerIds) {
-        GameEntity match = gameRepository.getReferenceById(gameId);
+        GameEntity game = gameRepository.getReferenceById(gameId);
         TeamEntity team = teamRepository.getReferenceById(userTeamId);
 
 
@@ -42,7 +42,7 @@ public class GamePlayerService {
                             .orElseThrow(() -> new RuntimeException("User not found: " + playerId));
 
                     return GamePlayerEntity.builder()
-                            .match(match)
+                            .game(game)
                             .user(user)
                             .gameTeam(gameTeam)
                             .joinedTeam(team)

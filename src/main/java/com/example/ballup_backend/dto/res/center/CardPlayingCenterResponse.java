@@ -1,6 +1,6 @@
 package com.example.ballup_backend.dto.res.center;
 
-import com.example.ballup_backend.entity.PlayingCenterEntity.PlayingCenterType;
+import com.example.ballup_backend.entity.TeamEntity.SportType;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -15,7 +15,7 @@ public class CardPlayingCenterResponse {
     Long id;
     String name;
     String address;
-    PlayingCenterType type; 
+    SportType type; 
     Long bookingCount; 
     String image;
     Integer primaryPrice;

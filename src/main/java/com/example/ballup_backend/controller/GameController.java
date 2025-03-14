@@ -62,4 +62,16 @@ public class GameController {
         gameService.updateGameTimeAndSlot(updateData);
         return ResponseEntity.status(HttpStatus.OK).body("Game updated successfully!");
     }
+
+    @PostMapping("/{gameId}/join")
+    public ResponseEntity<String> joinGame( @PathVariable Long gameId, @RequestParam Long userId) {
+        gameService.joinGame(gameId, userId);
+        return ResponseEntity.ok("Joined the game successfully");
+    }
+
+    @PostMapping("/{gameId}/join-team")
+    public ResponseEntity<String> joinGameAsTeam( @PathVariable Long gameId, @RequestParam Long userId) {
+        gameService.joinGameAsTeam(gameId, userId);
+        return ResponseEntity.ok("Team joined the game successfully");
+    }
 }

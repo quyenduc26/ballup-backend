@@ -13,6 +13,9 @@ import com.example.ballup_backend.entity.GamePlayerEntity;
 import com.example.ballup_backend.entity.UserEntity;
 
 public interface GamePlayerRepository extends JpaRepository<GamePlayerEntity, Long> {
+
+    boolean existsByGameAndUser(GameEntity game, UserEntity user);
+    
     @Query("SELECT gp.match FROM GamePlayerEntity gp WHERE gp.user = :user")
     List<GameEntity> findGamesByUser(@Param("user") UserEntity user);
 

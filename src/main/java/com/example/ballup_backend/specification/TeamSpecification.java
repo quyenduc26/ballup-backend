@@ -15,7 +15,7 @@ public class TeamSpecification {
                 criteriaBuilder.like(criteriaBuilder.lower(root.get("address")), "%" + location.toLowerCase() + "%");
     }
 
-    public static Specification<TeamEntity> filterBySport(TeamEntity.Sport sport) {
+    public static Specification<TeamEntity> filterBySport(TeamEntity.SportType sport) {
         return (root, query, criteriaBuilder) ->
                 criteriaBuilder.equal(root.get("sport"), sport);
     }

@@ -4,9 +4,9 @@ import com.example.ballup_backend.dto.req.team.KickTeamMemberRequest;
 import com.example.ballup_backend.dto.req.team.UpdateMemberRoleRequest;
 import com.example.ballup_backend.dto.res.team.TeamOverviewResponse;
 import com.example.ballup_backend.entity.TeamEntity;
-import com.example.ballup_backend.entity.TeamEntity.Sport;
 import com.example.ballup_backend.entity.TeamMemberEntity;
 import com.example.ballup_backend.entity.UserEntity;
+import com.example.ballup_backend.entity.TeamEntity.SportType;
 import com.example.ballup_backend.exception.BaseException;
 import com.example.ballup_backend.exception.ErrorCodeEnum;
 import com.example.ballup_backend.entity.TeamMemberEntity.Role;
@@ -95,13 +95,13 @@ public class TeamMemberService {
         teamMemberRepository.deleteByTeamId(teamId);
     }
 
-    public List<Long> getTeamMemberIds( Long userId, Sport sport) {
-        Long teamId = teamMemberRepository.findTeamsByUserIdAndSport(userId, sport);
+    public List<Long> getTeamMemberIds( Long userId, SportType sport) {
+        Long teamId = teamMemberRepository.findTeamsByUserIdAndSportType(userId, sport);
         return teamMemberRepository.findAllMemberIdsByTeamId(teamId);
     }
 
-    public TeamOverviewResponse getTeamByUserIdAndSport(Long userId, Sport sport) {
-        TeamEntity team = teamMemberRepository.findTeamByUserIdAndSport(userId, sport);
+    public TeamOverviewResponse getTeamByUserIdAndSport(Long userId, SportType sport) {
+        TeamEntity team = teamMemberRepository.findTeamByUserIdAndSportType(userId, sport);
     
         if (team == null) {
             throw new RuntimeException("Team not found for userId: " + userId + " and sport: " + sport);
