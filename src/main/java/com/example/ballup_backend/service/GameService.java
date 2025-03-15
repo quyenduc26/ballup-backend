@@ -1,7 +1,7 @@
 package com.example.ballup_backend.service;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -345,6 +345,8 @@ public class GameService {
             System.out.println(savedBooking.getBookingSlot());
             // Gán slot mới cho game
             game.setPlayingSlot(newSlot);
+            game.setFromTime(fromTimestamp);
+            game.setToTime(toTimestamp);
             game.setBooking(savedBooking);
 
             bookingRepository.deleteById(oldBooking.getId());
@@ -458,6 +460,89 @@ public class GameService {
         unavailableSlotRepository.deleteById(game.getBooking().getBookingSlot().getId());
         paymentRepository.deleteById(game.getBooking().getPayment().getId());
     }
+
+    public List<GameResponse> getGamesForHomepage() {
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        Timestamp oneHourLater = new Timestamp(now.getTime() + 3600 * 1000);  // +1 giờ
+        Timestamp twentyFourHoursLater = new Timestamp(now.getTime() + 24 * 3600 * 1000); // +24 giờ
+
+        List<GameEntity> upcomingGames = gameRepository.findUpcomingGamesWithin24Hours(oneHourLater, twentyFourHoursLater);
+        System.out.println(upcomingGames);
+
+        if (upcomingGames.size() < 6) {
+            List<GameEntity> extraGames = gameRepository.findExtraUpcomingGames(twentyFourHoursLater);
+            upcomingGames.addAll(extraGames);
+        }
+
+        return upcomingGames.stream()
+            .limit(6)
+            .map(game -> {
+                List<Long> teamIds = gamePlayerRepository.findTeamIdsByGameId(game.getId());
+                List<GamePlayerEntity> players = gamePlayerRepository.findAllPlayersByGameId(game.getId());
+
+                List<UserEntity> teamAPlayers = players.stream()
+                    .filter(gp -> gp.getGameTeam() == GamePlayerEntity.GameTeam.TEAMA)
+                    .map(GamePlayerEntity::getUser)
+                    .collect(Collectors.toList());
+
+                List<UserEntity> teamBPlayers = players.stream()
+                    .filter(gp -> gp.getGameTeam() != GamePlayerEntity.GameTeam.TEAMA)
+                    .map(GamePlayerEntity::getUser)
+                    .collect(Collectors.toList());
+
+                List<GameTeamMemberResponse> teamAResponses = teamAPlayers.stream()
+                    .map(user -> GameTeamMemberResponse.builder()
+                        .avatar(user.getAvatar())
+                        .firstName(user.getFirstName())
+                        .lastName(user.getLastName())
+                        .build())
+                    .collect(Collectors.toList());
+
+                List<GameTeamMemberResponse> teamBResponses = teamBPlayers.stream()
+                .map(user -> GameTeamMemberResponse.builder()
+                    .avatar(user.getAvatar())
+                    .firstName(user.getFirstName())
+                    .lastName(user.getLastName())
+                    .build())
+                .collect(Collectors.toList());
+              
+
+                TeamEntity teamA = !teamIds.isEmpty() ? teamRepository.getReferenceById(teamIds.get(0)) : null;
+                TeamEntity teamB = (teamIds.size() == 2) ? teamRepository.getReferenceById(teamIds.get(1)) : null;                
+                
+                return GameResponse.builder()
+                    .id(game.getId())
+                    .name(game.getName())
+                    .fromTime(game.getFromTime())
+                    .toTime(game.getToTime())
+                    .cover(game.getCover())
+                    .type(game.getType())
+                    .conversationId(game.getConversation() != null ? game.getConversation().getId() : null)
+                    .slotId(game.getPlayingSlot() != null ? game.getPlayingSlot().getId() : null)
+                    .centerName(game.getPlayingSlot() != null ? game.getPlayingSlot().getPlayingCenter().getName() : null)
+                    .slotName(game.getPlayingSlot() != null ? game.getPlayingSlot().getName() : null)
+                    .teamA(
+                        GameTeamResponse.builder()
+                        .name(teamA.getName())
+                        .intro(teamA.getIntro())
+                        .logo(teamA.getLogo())
+                        .members(teamAResponses)
+                        .build()
+                    )
+                    .teamB(!teamBResponses.isEmpty() ? 
+                        GameTeamResponse.builder()
+                        .name(teamB.getName())
+                        .intro(teamB.getIntro())
+                        .logo(teamB.getLogo())
+                        .members(teamBResponses)
+                        .build() : null
+                    )
+                    .build();
+            })
+            .collect(Collectors.toList());
+    }
+
+    
 
 
 }

@@ -198,4 +198,9 @@ public class TeamService {
             .totalMembers(teamMemberRepository.countByTeamId(team.getId())) 
             .build();
     }
+
+    public List<TeamEntity> getTeamForHomepage() {
+        List<TeamEntity> allTeams = teamMemberRepository.findTopTeamsWithMostMembers();
+        return allTeams.size() > 6 ? allTeams.subList(0, 6) : allTeams;
+    }
 }
