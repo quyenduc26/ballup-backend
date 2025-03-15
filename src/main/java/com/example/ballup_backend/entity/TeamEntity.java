@@ -46,10 +46,10 @@ public class TeamEntity {
     
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
-    private Sport sport;
+    private SportType sport;
 
 
-    public enum Sport {
+    public enum SportType {
         FOOTBALL, BADMINTON
     }
 

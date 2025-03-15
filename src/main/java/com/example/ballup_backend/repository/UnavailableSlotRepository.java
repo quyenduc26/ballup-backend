@@ -2,7 +2,6 @@ package com.example.ballup_backend.repository;
 
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -43,6 +42,13 @@ public interface UnavailableSlotRepository extends JpaRepository<UnavailableSlot
     """)
     boolean isSlotUnavailable(@Param("slotId") Long slotId, @Param("fromTime") Timestamp fromTime, @Param("toTime") Timestamp toTime);
 
+
+    @Query("SELECT us FROM UnavailableSlotEntity us WHERE us.slot.id = :slotId AND us.fromTime >= :startOfDay AND us.toTime <= :endOfDay AND us.status IN ('PROCESSING', 'DONE')")
+    List<UnavailableSlotEntity> findBySlotIdAndTimeRange(
+        @Param("slotId") Long slotId,
+        @Param("startOfDay") Timestamp startOfDay,
+        @Param("endOfDay") Timestamp endOfDay
+    );
 
 
 }

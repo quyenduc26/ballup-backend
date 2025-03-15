@@ -14,6 +14,6 @@ public class TeamOverviewResponse {
     private String name;
     private String logo;
     private String cover;
-    private TeamEntity.Sport sport;
+    private TeamEntity.SportType sport;
     private Long totalMembers;
 }

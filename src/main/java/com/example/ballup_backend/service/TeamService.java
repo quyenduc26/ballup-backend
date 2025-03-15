@@ -7,7 +7,6 @@ import com.example.ballup_backend.dto.res.team.TeamMemberResponse;
 import com.example.ballup_backend.dto.res.team.TeamOverviewResponse;
 import com.example.ballup_backend.dto.res.team.TeamResponse;
 import com.example.ballup_backend.entity.TeamEntity;
-import com.example.ballup_backend.entity.TeamEntity.Sport;
 import com.example.ballup_backend.entity.TeamMemberEntity;
 import com.example.ballup_backend.entity.UserEntity;
 import com.example.ballup_backend.entity.TeamMemberEntity.Role;
@@ -67,7 +66,7 @@ public class TeamService {
             .orElseThrow(() -> new RuntimeException("User not found"));
     
         // Kiểm tra xem user đã tham gia team nào có cùng sport hay chưa
-        boolean isAlreadyInTeam = teamMemberRepository.existsByUserIdAndTeamSport(userId, team.getSport());
+        boolean isAlreadyInTeam = teamMemberRepository.existsByUserIdAndTeamSportType(userId, team.getSport());
         
         if (isAlreadyInTeam) {
             throw new RuntimeException("You are already a member of a team in the same sport ");
@@ -85,7 +84,7 @@ public class TeamService {
     }
     
 
-    public List<TeamResponse> getAllTeams(String name, String location, TeamEntity.Sport sport, String sortBy) {
+    public List<TeamResponse> getAllTeams(String name, String location, TeamEntity.SportType sport, String sortBy) {
         Specification<TeamEntity> spec = Specification.where(null);
 
         if (name != null && !name.isEmpty()) {

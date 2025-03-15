@@ -18,7 +18,7 @@ import com.example.ballup_backend.dto.req.team.KickTeamMemberRequest;
 import com.example.ballup_backend.dto.req.team.UpdateMemberRoleRequest;
 import com.example.ballup_backend.dto.res.team.TeamOverviewResponse;
 import com.example.ballup_backend.entity.TeamMemberEntity;
-import com.example.ballup_backend.entity.TeamEntity.Sport;
+import com.example.ballup_backend.entity.TeamEntity.SportType;
 import com.example.ballup_backend.entity.TeamMemberEntity.Role;
 import com.example.ballup_backend.service.TeamMemberService;
     
@@ -53,12 +53,12 @@ public class TeamMemberController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<List<Long>> getTeamMemberIds( @PathVariable Long userId,  @RequestParam Sport sport) {
+    public ResponseEntity<List<Long>> getTeamMemberIds( @PathVariable Long userId,  @RequestParam SportType sport) {
         return ResponseEntity.ok(teamMemberService.getTeamMemberIds(userId, sport));
     }
 
     @GetMapping("/{userId}/team")
-    public ResponseEntity<TeamOverviewResponse> getTeamByUserIdAndSport( @PathVariable Long userId,  @RequestParam Sport sport) {
+    public ResponseEntity<TeamOverviewResponse> getTeamByUserIdAndSport( @PathVariable Long userId,  @RequestParam SportType sport) {
         return ResponseEntity.ok(teamMemberService.getTeamByUserIdAndSport(userId, sport));
     }
 

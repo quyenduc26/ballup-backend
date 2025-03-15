@@ -6,7 +6,6 @@ import com.example.ballup_backend.dto.res.team.TeamDetailResponse;
 import com.example.ballup_backend.dto.res.team.TeamOverviewResponse;
 import com.example.ballup_backend.dto.res.team.TeamResponse;
 import com.example.ballup_backend.entity.TeamEntity;
-import com.example.ballup_backend.entity.TeamEntity.Sport;
 import com.example.ballup_backend.service.TeamService;
 
 import java.util.List;
@@ -30,7 +29,7 @@ public class TeamController {
     public ResponseEntity<List<TeamResponse>> getAllTeams(
             @RequestParam(value = "name", required = false) String name,
             @RequestParam(value = "location", required = false) String location,
-            @RequestParam(value = "sport", required = false) TeamEntity.Sport sport,
+            @RequestParam(value = "sport", required = false) TeamEntity.SportType sport,
             @RequestParam(value = "sortBy", required = false) String sortBy) {
 
         List<TeamResponse> teams = teamService.getAllTeams(name, location, sport, sortBy);

@@ -1,7 +1,7 @@
 package com.example.ballup_backend.dto.req.team;
 
 
-import com.example.ballup_backend.entity.TeamEntity.Sport;
+import com.example.ballup_backend.entity.TeamEntity.SportType;
 
 import lombok.*;
 
@@ -14,7 +14,7 @@ public class CreateTeamRequest {
     private String intro;
     private String logo;
     private String cover;
-    private Sport sport;
+    private SportType sport;
     private Long userId;
 }
 

@@ -6,6 +6,8 @@ import java.sql.Timestamp;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.example.ballup_backend.entity.TeamEntity.SportType;
+
 @Entity
 @Table(name = "game")
 @Getter
@@ -63,10 +65,7 @@ public class GameEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
-    private GameType type;
+    private SportType type;
 
-    public enum GameType {
-        FOOTBALL,BADMINTON
-    }
 }
 

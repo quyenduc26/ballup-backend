@@ -2,7 +2,7 @@ package com.example.ballup_backend.dto.req.game;
 
 import java.util.List;
 
-import com.example.ballup_backend.entity.GameEntity.GameType;
+import com.example.ballup_backend.entity.TeamEntity.SportType;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -24,6 +24,6 @@ public class CreateGameRequest {
     String cover; 
     Integer membersRequired;
     List<Long> memberIdList;
-    GameType type;
+    SportType type;
     @Builder.Default Long slotId = null;
 }

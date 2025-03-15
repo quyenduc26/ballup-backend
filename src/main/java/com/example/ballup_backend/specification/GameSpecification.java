@@ -2,6 +2,8 @@ package com.example.ballup_backend.specification;
 
 import org.springframework.data.jpa.domain.Specification;
 import com.example.ballup_backend.entity.GameEntity;
+import com.example.ballup_backend.entity.TeamEntity;
+
 import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +22,7 @@ public class GameSpecification {
             }
 
             if (sport != null && !sport.isEmpty()) {
-                predicates.add(criteriaBuilder.equal(root.get("type"), GameEntity.GameType.valueOf(sport.toUpperCase())));
+                predicates.add(criteriaBuilder.equal(root.get("type"), TeamEntity.SportType.valueOf(sport.toUpperCase())));
             }
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

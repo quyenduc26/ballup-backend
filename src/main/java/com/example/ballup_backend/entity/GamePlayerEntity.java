@@ -20,15 +20,15 @@ public class GamePlayerEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "match_id", nullable = false)
-    private GameEntity match;
+    @JoinColumn(name = "game_id", nullable = false)
+    private GameEntity game;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
     @ManyToOne
-    @JoinColumn(name = "team_id", nullable = false)
+    @JoinColumn(name = "team_id", nullable = true)
     private TeamEntity joinedTeam;
 
     @Enumerated(EnumType.STRING)
