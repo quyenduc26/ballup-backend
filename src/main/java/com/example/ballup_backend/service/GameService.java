@@ -47,6 +47,7 @@ import com.example.ballup_backend.repository.UserRepository;
 import com.example.ballup_backend.specification.GameSpecification;
 import com.example.ballup_backend.util.common.BookingPriceCalculator;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -373,6 +374,12 @@ public class GameService {
         }
         gameRepository.save(game);
     }
+
+    @Transactional
+    public void leaveGame(Long gameId, Long userId) {
+        gamePlayerRepository.deleteByGameIdAndUserId(gameId, userId);
+        conversationMemberRepository.deleteByUserIdAndConversationId( userId, gameRepository.getReferenceById(gameId).getConversation().getId());
+    }
     
     @Transactional
     public void joinGame(Long gameId, Long userId) {
@@ -414,6 +421,7 @@ public class GameService {
                 GamePlayerEntity gamePlayer = GamePlayerEntity.builder()
                     .game(game)
                     .user(member)
+                    .joinedTeam(teamMembers)
                     .gameTeam(GameTeam.TEAMB) 
                     .build();
                 gamePlayerRepository.save(gamePlayer);
@@ -426,5 +434,30 @@ public class GameService {
             }
         }
     }
+
+    @Transactional
+    public void cancelGame( Long gameId, Long userId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        GameEntity game = gameRepository.findById(gameId)
+                .orElseThrow(() -> new EntityNotFoundException("Game not found"));
+
+        if (!game.getCreator().getId().equals(user.getId())) {
+            throw new RuntimeException("Only the creator can cancel the team.");
+        }
+        Long conversationId = game.getConversation() != null ? game.getConversation().getId() : null;
+        gamePlayerRepository.deleteByGameId(game.getId());
+
+        gameRepository.deleteById(game.getId());
+        if (conversationId != null) {
+            conversationMemberRepository.deleteByConversationId(conversationId);
+            conversationRepository.deleteById(conversationId);
+        }
+        bookingRepository.deleteById(game.getBooking().getId());
+        unavailableSlotRepository.deleteById(game.getBooking().getBookingSlot().getId());
+        paymentRepository.deleteById(game.getBooking().getPayment().getId());
+    }
+
 
 }

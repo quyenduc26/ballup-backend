@@ -3,6 +3,7 @@ package com.example.ballup_backend.controller;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.ballup_backend.dto.res.slot.UnavailableSlotResponse;
 import com.example.ballup_backend.service.UnavailableSlotService;
 
 
@@ -27,6 +29,11 @@ public class UnavailableSlotController {
         Timestamp toTimestamp = new Timestamp(toTime);
         
         return unavailableSlotService.isSlotUnavailable(slotId, fromTimestamp, toTimestamp);
+    }
+
+    @GetMapping("/{slotId}/blocked")
+    public List<UnavailableSlotResponse> getSlotUnavailable(@PathVariable Long slotId, @RequestParam Long startOfDay, @RequestParam Long endOfDay) {
+        return unavailableSlotService.getUnavailableSlotsByDate(slotId, startOfDay, endOfDay);
     }
     
 }

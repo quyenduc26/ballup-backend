@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -73,5 +74,18 @@ public class GameController {
     public ResponseEntity<String> joinGameAsTeam( @PathVariable Long gameId, @RequestParam Long userId) {
         gameService.joinGameAsTeam(gameId, userId);
         return ResponseEntity.ok("Team joined the game successfully");
+
+    }
+
+    @PatchMapping("/{gameId}/leave")
+    public ResponseEntity<String> leaveGame(@PathVariable Long gameId, @RequestParam Long userId) {
+        gameService.leaveGame(gameId, userId);
+        return ResponseEntity.status(HttpStatus.OK).body("Left the game successfully!");
+    }
+
+    @DeleteMapping("/{gameId}/cancel-game")
+    public ResponseEntity<String> cancelGame(@PathVariable Long gameId, @RequestParam Long userId) {
+        gameService.cancelGame(gameId, userId);
+        return ResponseEntity.status(HttpStatus.OK).body("Game canceled successfully!");
     }
 }

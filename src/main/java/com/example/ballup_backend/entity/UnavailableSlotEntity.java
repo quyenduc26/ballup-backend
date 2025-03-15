@@ -53,3 +53,6 @@ public class UnavailableSlotEntity {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt;
 }
+
+
+
