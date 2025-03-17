@@ -19,7 +19,7 @@ public interface TeamMemberRepository extends JpaRepository<TeamMemberEntity, Lo
     @Query("SELECT COUNT(tm) FROM TeamMemberEntity tm WHERE tm.team.id = :teamId")
     Long countByTeamId(Long teamId);
 
-   @Query("SELECT tm.user FROM TeamMemberEntity tm WHERE tm.team.id = :teamId")
+   @Query("SELECT tm.user FROM TeamMemberEntity tm WHERE tm.team IS NOT NULL AND tm.team.id = :teamId")
     List<UserEntity> findUsersByTeamId(@Param("teamId") Long teamId);
 
     @Query("SELECT tm.user.id FROM TeamMemberEntity tm WHERE tm.team.id = :teamId AND tm.role = 'owner'")
@@ -48,6 +48,13 @@ public interface TeamMemberRepository extends JpaRepository<TeamMemberEntity, Lo
 
     @Query("SELECT tm.team FROM TeamMemberEntity tm WHERE tm.user.id = :userId AND tm.team.sport = :sportType")
     TeamEntity findTeamByUserIdAndSportType(@Param("userId") Long userId, @Param("sportType") SportType sportType);
+
+    @Query("""
+        SELECT tm.team FROM TeamMemberEntity tm
+        GROUP BY tm.team.id
+        ORDER BY COUNT(tm.id) DESC
+    """)
+    List<TeamEntity> findTopTeamsWithMostMembers();
 
 }
 

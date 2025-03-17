@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import com.example.ballup_backend.controller.AdminController;
 import com.example.ballup_backend.dto.req.slot.CreateSlotRequest;
 import com.example.ballup_backend.dto.req.slot.DisableSlotRequest;
 import com.example.ballup_backend.dto.req.slot.UpdateSlotRequest;
@@ -33,6 +33,8 @@ import jakarta.transaction.Transactional;
 @Service
 public class PlayingSlotService {
 
+    private final AdminController adminController;
+
     @Autowired
     private PlayingSlotRepository playingSlotRepository; 
 
@@ -52,7 +54,11 @@ public class PlayingSlotService {
     private UnavailableSlotService unavailableSlotService;
 
     @Autowired
-    private PaymentRepository paymentRepository; 
+    private PaymentRepository paymentRepository;
+
+    PlayingSlotService(AdminController adminController) {
+        this.adminController = adminController;
+    } 
 
     public PlayingSlotEntity createPlayingSlot(CreateSlotRequest request) {
         PlayingCenterEntity playingCenter = playingCenterRepository.findById(request.getPlayingCenterId())
@@ -71,63 +77,68 @@ public class PlayingSlotService {
     public Long disableSlot(DisableSlotRequest request) {
         Timestamp fromTimestamp = new Timestamp(request.getFromTime());
         Timestamp toTimestamp = new Timestamp(request.getToTime());
- 
-        // In kết quả
+    
         System.out.println("From Timestamp: " + fromTimestamp.toLocalDateTime());
         System.out.println("To Timestamp: " + toTimestamp.toLocalDateTime());
-
-        //check available
+    
         boolean isAvailable = unavailableSlotService.isSlotUnavailable(request.getPlayingSlotId(), fromTimestamp, toTimestamp);
-        if(isAvailable) { 
+        if (isAvailable) { 
             throw new RuntimeException("Slot not available"); 
         }
-
-        //check valid slot, user
+    
         PlayingSlotEntity playingSlot = playingSlotRepository.findById(request.getPlayingSlotId())
             .orElseThrow(() -> new RuntimeException("Playing slot not found"));
     
         UserEntity user = userRepository.findById(request.getUserId())
             .orElseThrow(() -> new RuntimeException("User not found"));
     
-        //prepaer role
         UnavailableSlotEntity.createdBy createdBy = user.getRole().equals(Role.OWNER) 
             ? UnavailableSlotEntity.createdBy.BY_OWNER 
             : UnavailableSlotEntity.createdBy.BY_USER;
-
-        //create unavailable entity
-        UnavailableSlotEntity unavailableSlot = UnavailableSlotEntity.builder()
-            .fromTime(fromTimestamp)
-            .toTime(toTimestamp)
-            .slot(playingSlot)
-            .creator(user)
-            .createBy(createdBy) 
-            .status(Status.SUBMITTING)
-            .build();
-        unavailableSlotRepository.save(unavailableSlot);
-
-        //if user -> create booking
-        if(user.getRole().equals(Role.USER)){
-            //tạo payment cho booking
+    
+        UnavailableSlotEntity unavailableSlot; // Khai báo biến trước
+    
+        if (user.getRole().equals(Role.USER)) {
+            unavailableSlot = UnavailableSlotEntity.builder()
+                .fromTime(fromTimestamp)
+                .toTime(toTimestamp)
+                .slot(playingSlot)
+                .creator(user)
+                .createBy(createdBy)
+                .status(Status.SUBMITTING)
+                .build();
+            unavailableSlotRepository.save(unavailableSlot);
+    
             PaymentEntity bookingPayment = PaymentEntity.builder()
                 .amount(request.getAmount())
                 .creator(user)
                 .status(PaymentStatus.PENDING)
                 .build();
             PaymentEntity savedPaymentEntity = paymentRepository.save(bookingPayment);
-
+    
             BookingEntity bookingEntity = BookingEntity.builder()
                 .status(BookingStatus.REQUESTED)
                 .payment(savedPaymentEntity)
                 .bookingSlot(unavailableSlot)
                 .build();
             bookingRepository.save(bookingEntity);
-
+    
             return bookingEntity.getId();
-        }   
-
-        return unavailableSlot.getId();
-        
+        } else {
+            unavailableSlot = UnavailableSlotEntity.builder()  // Gán giá trị cho biến
+                .fromTime(fromTimestamp)
+                .toTime(toTimestamp)
+                .slot(playingSlot)
+                .creator(user)
+                .createBy(createdBy)
+                .status(Status.DONE)
+                .build();
+            unavailableSlotRepository.save(unavailableSlot);
+        }
+    
+        return unavailableSlot.getId(); // Trả về giá trị sau khi đảm bảo biến đã được gán
     }
+    
 
     public List<UnavailableSlotResponse> getDisabledSlots(Long slotId) {
 

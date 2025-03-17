@@ -18,7 +18,7 @@ public class MessageEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long messageId;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "conversation_id", nullable = false)

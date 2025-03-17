@@ -34,4 +34,7 @@ public class GameResponse {
     private String slotName;
     private GameTeamResponse teamA;
     
+    @Nullable
+    private GameTeamResponse teamB;
+    
 }

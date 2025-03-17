@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 
 import com.example.ballup_backend.entity.GameEntity;
 import com.example.ballup_backend.entity.GamePlayerEntity;
+import com.example.ballup_backend.entity.TeamEntity;
 import com.example.ballup_backend.entity.UserEntity;
 
 import jakarta.transaction.Transactional;
@@ -22,7 +23,10 @@ public interface GamePlayerRepository extends JpaRepository<GamePlayerEntity, Lo
     @Query("SELECT gp.game FROM GamePlayerEntity gp WHERE gp.user = :user")
     List<GameEntity> findGamesByUser(@Param("user") UserEntity user);
 
-    @Query("SELECT DISTINCT gp.gameTeam FROM GamePlayerEntity gp WHERE gp.game.id = :gameId")
+    @Query("""
+        SELECT DISTINCT gp.gameTeam FROM GamePlayerEntity gp
+        WHERE gp.game.id IS NOT NULL AND gp.game.id = :gameId 
+    """)
     List<GamePlayerEntity.GameTeam> findDistinctTeamsByGameId(@Param("gameId") Long gameId);
     
     Optional<GamePlayerEntity> findFirstByGameIdAndGameTeam(Long gameId, GamePlayerEntity.GameTeam gameTeam);
@@ -32,17 +36,15 @@ public interface GamePlayerRepository extends JpaRepository<GamePlayerEntity, Lo
         List<Long> teamIds = new ArrayList<>();
 
         for (GamePlayerEntity.GameTeam team : distinctTeams) {
-            Long teamId = findFirstByGameIdAndGameTeam(gameId, team)
-                    .map(gp -> gp.getJoinedTeam().getId())
-                    .orElse(null);
-
-            if (teamId != null) {
-                teamIds.add(teamId);
-            }
+            findFirstByGameIdAndGameTeam(gameId, team)
+                .map(GamePlayerEntity::getJoinedTeam)
+                .map(TeamEntity::getId)
+                .ifPresent(teamIds::add); // Chỉ thêm nếu không NULL
         }
 
         return teamIds;
     }
+
 
     @Transactional
     @Modifying
@@ -53,5 +55,14 @@ public interface GamePlayerRepository extends JpaRepository<GamePlayerEntity, Lo
     @Modifying
     @Query("DELETE FROM GamePlayerEntity gp WHERE gp.game.id = :gameId")
     void deleteByGameId(@Param("gameId") Long gameId);
+
+    @Query("SELECT gp FROM GamePlayerEntity gp WHERE gp.game.id = :gameId")
+    List<GamePlayerEntity> findAllPlayersByGameId(@Param("gameId") Long gameId);
+
+    @Query("SELECT COUNT(gp) FROM GamePlayerEntity gp WHERE gp.game.id = :gameId")
+    Integer countPlayersByGameId(@Param("gameId") Long gameId);
+
+
+
 
 } 

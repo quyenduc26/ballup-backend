@@ -88,4 +88,10 @@ public class GameController {
         gameService.cancelGame(gameId, userId);
         return ResponseEntity.status(HttpStatus.OK).body("Game canceled successfully!");
     }
+
+    // @GetMapping()
+    // public ResponseEntity<List<GameResponse>> getGamesForHomepage() {
+    //     List<GameResponse> games = gameService.getGamesForHomepage();
+    //     return ResponseEntity.ok(games);
+    // }
 }
