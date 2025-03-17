@@ -18,7 +18,7 @@ public class GameSpecification {
             }
 
             if (address != null && !address.isEmpty()) {
-                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("location")), "%" + address.toLowerCase() + "%"));
+                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("address")), "%" + address.toLowerCase() + "%"));
             }
 
             if (sport != null && !sport.isEmpty()) {
