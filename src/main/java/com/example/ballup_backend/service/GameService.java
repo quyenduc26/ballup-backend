@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import com.example.ballup_backend.controller.AdminController;
 import com.example.ballup_backend.dto.req.game.CreateGameRequest;
 import com.example.ballup_backend.dto.req.game.UpdateGameInfoRequest;
 import com.example.ballup_backend.dto.req.game.UpdateGameTimeAndSlotRequest;
@@ -53,7 +52,6 @@ import jakarta.transaction.Transactional;
 @Service
 public class GameService {
 
-    private final AdminController adminController;
     @Autowired
     private GameRepository gameRepository;
 
@@ -98,10 +96,6 @@ public class GameService {
 
     @Autowired
     private PaymentRepository paymentRepository;
-
-    GameService(AdminController adminController) {
-        this.adminController = adminController;
-    } 
 
     @Transactional
     public void createGame(CreateGameRequest request) {
