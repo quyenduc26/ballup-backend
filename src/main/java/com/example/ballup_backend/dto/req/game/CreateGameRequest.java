@@ -19,7 +19,7 @@ public class CreateGameRequest {
     String name;
     Long fromTime;
     Long toTime;
-    String location;
+    String address;
     String description;
     String cover; 
     Integer membersRequired;

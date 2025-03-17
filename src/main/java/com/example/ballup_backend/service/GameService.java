@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-
+import com.example.ballup_backend.controller.AdminController;
 import com.example.ballup_backend.dto.req.game.CreateGameRequest;
 import com.example.ballup_backend.dto.req.game.UpdateGameInfoRequest;
 import com.example.ballup_backend.dto.req.game.UpdateGameTimeAndSlotRequest;
@@ -52,6 +52,8 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class GameService {
+
+    private final AdminController adminController;
     @Autowired
     private GameRepository gameRepository;
 
@@ -95,7 +97,11 @@ public class GameService {
     private BookingPriceCalculator bookingPriceCalculator; 
 
     @Autowired
-    private PaymentRepository paymentRepository; 
+    private PaymentRepository paymentRepository;
+
+    GameService(AdminController adminController) {
+        this.adminController = adminController;
+    } 
 
     @Transactional
     public void createGame(CreateGameRequest request) {
@@ -164,7 +170,7 @@ public class GameService {
                 .creator(creator)
                 .fromTime(fromTimestamp)
                 .toTime(toTimestamp)
-                .address(request.getLocation())
+                .address(request.getAddress())
                 .description(request.getDescription())
                 .type(request.getType())
                 .conversation(savedConversation)
@@ -179,7 +185,7 @@ public class GameService {
             .creator(creator)
             .fromTime(fromTimestamp)
             .toTime(toTimestamp)
-            .address(request.getLocation())
+            .address(request.getAddress())
             .description(request.getDescription())
             .type(request.getType())
             .conversation(savedConversation)
@@ -219,58 +225,101 @@ public class GameService {
             .collect(Collectors.toList());
     }
 
-   @Transactional
+    @Transactional
     public List<GameResponse> getGamesWithOnlyTeamA(String name, String address, String sport) {
         // Tạo specification để lọc game theo điều kiện
         Specification<GameEntity> spec = GameSpecification.filterGames(name, address, sport);
-
+    
         // Lấy danh sách game theo filter
         List<GameEntity> allGames = gameRepository.findAll(spec);
-        List<GameResponse> resultList;
-
+        
         // Lọc ra các game chỉ có teamA
         List<GameEntity> filteredGames = allGames.stream()
             .filter(game -> {
-                List<Long> teamIds = gamePlayerRepository.findTeamIdsByGameId(game.getId());
-                return teamIds.size() == 1; // Chỉ có duy nhất teamA
+                Integer gamePlayer = gamePlayerRepository.countPlayersByGameId(game.getId());
+                return gamePlayer != null && gamePlayer < game.getMembersRequired() * 2;
             })
             .collect(Collectors.toList());
-
-            resultList = filteredGames.stream().map(game -> {
-                List<Long> teamIds = gamePlayerRepository.findTeamIdsByGameId(game.getId());
-                TeamEntity team = teamRepository.getReferenceById(teamIds.get(0));
-                List<UserEntity> teamMembers = teamMemberRepository.findUsersByTeamId(team.getId());
-                List<GameTeamMemberResponse> memberResponses = teamMembers.stream()
-                    .map(user -> GameTeamMemberResponse.builder()
-                        .avatar(user.getAvatar())
-                        .firstName(user.getFirstName())
-                        .lastName(user.getLastName())
-                        .build())
-                    .collect(Collectors.toList());
-                GameTeamResponse teamA = GameTeamResponse.builder()
-                    .name(team.getName())
-                    .intro(team.getIntro())
-                    .logo(team.getLogo())
-                    .members(memberResponses)
+    
+        return filteredGames.stream().map(game -> {
+            List<GamePlayerEntity> players = gamePlayerRepository.findAllPlayersByGameId(game.getId());
+    
+            // Chia danh sách người chơi thành 2 đội
+            List<UserEntity> teamAPlayers = new ArrayList<>();
+            List<UserEntity> teamBPlayers = new ArrayList<>();
+            
+            for (GamePlayerEntity gp : players) {
+                if (gp != null && gp.getUser() != null) {
+                    if (gp.getGameTeam() == GamePlayerEntity.GameTeam.TEAMA) {
+                        teamAPlayers.add(gp.getUser());
+                    } else {
+                        teamBPlayers.add(gp.getUser());
+                    }
+                }
+            }
+    
+            // Chuyển đổi danh sách thành GameTeamMemberResponse
+            List<GameTeamMemberResponse> teamAMembers = teamAPlayers.stream()
+                .map(user -> GameTeamMemberResponse.builder()
+                    .avatar(user.getAvatar())
+                    .firstName(user.getFirstName())
+                    .lastName(user.getLastName())
+                    .build())
+                .collect(Collectors.toList());
+    
+            List<GameTeamMemberResponse> teamBMembers = teamBPlayers.stream()
+                .map(user -> GameTeamMemberResponse.builder()
+                    .avatar(user.getAvatar())
+                    .firstName(user.getFirstName())
+                    .lastName(user.getLastName())
+                    .build())
+                .collect(Collectors.toList());
+    
+            // Lấy danh sách TeamEntity từ game
+            List<Long> teamIds = gamePlayerRepository.findTeamIdsByGameId(game.getId());
+            TeamEntity teamJoinedA = (!teamIds.isEmpty() && teamIds.get(0) != null) ? teamRepository.findById(teamIds.get(0)).orElse(null) : null;
+            TeamEntity teamJoinedB = (teamIds.size() > 1 && teamIds.get(1) != null) ? teamRepository.findById(teamIds.get(1)).orElse(null) : null;
+    
+            // Xây dựng response cho teamA và teamB
+            GameTeamResponse teamA = null;
+            GameTeamResponse teamB = null;
+    
+            if (teamJoinedA != null) {
+                teamA = GameTeamResponse.builder()
+                    .name(teamJoinedA.getName())
+                    .intro(teamJoinedA.getIntro())
+                    .logo(teamJoinedA.getLogo())
+                    .members(teamAMembers)
                     .build();
-
-                return GameResponse.builder()
+            }
+    
+            if (teamJoinedB != null) {
+                teamB = GameTeamResponse.builder()
+                    .name(teamJoinedB.getName())
+                    .intro(teamJoinedB.getIntro())
+                    .logo(teamJoinedB.getLogo())
+                    .members(teamBMembers)
+                    .build();
+            }
+    
+            return GameResponse.builder()
                 .id(game.getId())
-                    .name(game.getName())
-                    .fromTime(game.getFromTime())
-                    .toTime(game.getToTime())
-                    .cover(game.getCover())
-                    .type(game.getType())
-                    .conversationId(game.getConversation().getId())
-                    .slotId(game.getPlayingSlot() != null ? game.getPlayingSlot().getId() : null)
-                    .centerName(game.getPlayingSlot() != null ? game.getPlayingSlot().getPlayingCenter().getName() : null)
-                    .slotName(game.getPlayingSlot() != null ? game.getPlayingSlot().getName() : null)
-                    .teamA(teamA)
-                    .build();
-            }).collect(Collectors.toList());
-
-            return resultList;
-        }
+                .name(game.getName())
+                .fromTime(game.getFromTime())
+                .toTime(game.getToTime())
+                .cover(game.getCover())
+                .type(game.getType())
+                .conversationId(game.getConversation() != null ? game.getConversation().getId() : null)
+                .slotId(game.getPlayingSlot() != null ? game.getPlayingSlot().getId() : null)
+                .centerName((game.getPlayingSlot() != null && game.getPlayingSlot().getPlayingCenter() != null) 
+                            ? game.getPlayingSlot().getPlayingCenter().getName() : null)
+                .slotName(game.getPlayingSlot() != null ? game.getPlayingSlot().getName() : null)
+                .teamA(teamA)
+                .teamB(teamB)
+                .build();
+        }).collect(Collectors.toList());
+    }
+    
 
 
     @Transactional
@@ -467,8 +516,6 @@ public class GameService {
         Timestamp twentyFourHoursLater = new Timestamp(now.getTime() + 24 * 3600 * 1000); // +24 giờ
 
         List<GameEntity> upcomingGames = gameRepository.findUpcomingGamesWithin24Hours(oneHourLater, twentyFourHoursLater);
-        System.out.println(upcomingGames);
-
         if (upcomingGames.size() < 6) {
             List<GameEntity> extraGames = gameRepository.findExtraUpcomingGames(twentyFourHoursLater);
             upcomingGames.addAll(extraGames);

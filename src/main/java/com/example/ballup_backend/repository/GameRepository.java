@@ -20,8 +20,7 @@ public interface GameRepository extends JpaRepository<GameEntity, Long>, JpaSpec
         HAVING COUNT(gp.id) < (g.membersRequired * 2)
         ORDER BY g.booking.bookingSlot.fromTime ASC
     """)
-    List<GameEntity> findUpcomingGamesWithin24Hours(@Param("oneHourLater") Timestamp oneHourLater,
-                                                    @Param("twentyFourHoursLater") Timestamp twentyFourHoursLater);
+    List<GameEntity> findUpcomingGamesWithin24Hours(@Param("oneHourLater") Timestamp oneHourLater, @Param("twentyFourHoursLater") Timestamp twentyFourHoursLater);
     
     @Query("""
         SELECT g FROM GameEntity g

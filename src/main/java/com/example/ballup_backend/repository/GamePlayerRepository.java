@@ -59,6 +59,10 @@ public interface GamePlayerRepository extends JpaRepository<GamePlayerEntity, Lo
     @Query("SELECT gp FROM GamePlayerEntity gp WHERE gp.game.id = :gameId")
     List<GamePlayerEntity> findAllPlayersByGameId(@Param("gameId") Long gameId);
 
+    @Query("SELECT COUNT(gp) FROM GamePlayerEntity gp WHERE gp.game.id = :gameId")
+    Integer countPlayersByGameId(@Param("gameId") Long gameId);
+
+
 
 
 } 
