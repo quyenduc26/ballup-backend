@@ -125,15 +125,23 @@ public class TeamService {
         List<UserEntity> teamMembers = teamMemberRepository.findUsersByTeamId(teamId);
     
         List<TeamMemberResponse> memberResponses = teamMembers.stream()
-            .map(teamMember -> TeamMemberResponse.builder()
+        .map(teamMember -> {
+            String fullName = (teamMember.getLastName() == null ? "" : teamMember.getLastName()) + 
+                              " " + 
+                              (teamMember.getFirstName() == null ? "" : teamMember.getFirstName());
+            fullName = fullName.trim().isEmpty() ? "Anonymous" : fullName.trim();
+    
+            return TeamMemberResponse.builder()
                 .id(teamMember.getId())
-                .name(teamMember.getLastName().concat(" " +teamMember.getFirstName()))
+                .name(fullName)
                 .username(teamMember.getUsername())
                 .avatar(teamMember.getAvatar())
                 .height(teamMember.getHeight())
                 .weight(teamMember.getWeight())
-                .build())
-            .collect(Collectors.toList());
+                .build();
+        })
+        .collect(Collectors.toList());
+    
 
         Long ownerId = teamMemberRepository.findOwnerByTeamId(teamId)
             .orElse(null); // Trả về null nếu không có owner nào
