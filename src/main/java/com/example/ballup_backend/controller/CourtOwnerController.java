@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -111,8 +112,23 @@ public class CourtOwnerController {
     public ResponseEntity<String> updatePlayingSlot( @PathVariable Long id, @Valid @RequestBody UpdateSlotRequest request) {
         playingSlotService.updatePlayingSlot(id, request);
         return ResponseEntity.ok("Updated playing slot successfully");
-
     }
+
+    //delete
+    @DeleteMapping("center/delete/{id}")
+    public ResponseEntity<String> deletePlayingCenter(@PathVariable Long id) {
+        playingCenterService.deletePlayingCenter(id);
+        return ResponseEntity.ok("Deleted center successfully");
+    }
+
+    @DeleteMapping("slot/delete/{id}")
+    public ResponseEntity<String> deletePlayingSlot(@PathVariable Long id) {
+        playingSlotService.deletePlayingSlot(id);
+        return ResponseEntity.ok("Deleted playing slot successfully");
+    }
+
+    
+
 
 
 }

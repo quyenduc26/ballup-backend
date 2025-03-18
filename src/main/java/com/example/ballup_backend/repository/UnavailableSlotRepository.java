@@ -51,4 +51,26 @@ public interface UnavailableSlotRepository extends JpaRepository<UnavailableSlot
     );
 
 
+    @Query("""
+        SELECT u FROM UnavailableSlotEntity u 
+        WHERE u.slot.id = :slotId 
+        AND u.fromTime > CURRENT_TIMESTAMP 
+        AND u.createBy  = 'BY_USER' 
+        AND u.status IN ('PROCESSING', 'DONE')
+        ORDER BY u.fromTime DESC
+        """)
+    List<UnavailableSlotEntity> findUpcomingUnavailableSlots(@Param("slotId") Long slotId);
+    
+    @Query("""
+        SELECT u FROM UnavailableSlotEntity u 
+        WHERE u.slot.id IN :slotIds 
+        AND u.fromTime > CURRENT_TIMESTAMP 
+        AND u.createBy = 'BY_USER' 
+        AND u.status IN ('PROCESSING', 'DONE')
+        ORDER BY u.slot.id, u.fromTime DESC
+        """)
+    List<UnavailableSlotEntity> findUpcomingUnavailableSlotsBySlotIds(@Param("slotIds") List<Long> slotIds);
+    
+
+
 }

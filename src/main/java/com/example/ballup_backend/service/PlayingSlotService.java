@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.example.ballup_backend.controller.AdminController;
 import com.example.ballup_backend.dto.req.slot.CreateSlotRequest;
 import com.example.ballup_backend.dto.req.slot.DisableSlotRequest;
 import com.example.ballup_backend.dto.req.slot.UpdateSlotRequest;
@@ -28,12 +27,11 @@ import com.example.ballup_backend.repository.PlayingSlotRepository;
 import com.example.ballup_backend.repository.UnavailableSlotRepository;
 import com.example.ballup_backend.repository.UserRepository;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
 @Service
 public class PlayingSlotService {
-
-    private final AdminController adminController;
 
     @Autowired
     private PlayingSlotRepository playingSlotRepository; 
@@ -55,10 +53,6 @@ public class PlayingSlotService {
 
     @Autowired
     private PaymentRepository paymentRepository;
-
-    PlayingSlotService(AdminController adminController) {
-        this.adminController = adminController;
-    } 
 
     public PlayingSlotEntity createPlayingSlot(CreateSlotRequest request) {
         PlayingCenterEntity playingCenter = playingCenterRepository.findById(request.getPlayingCenterId())
@@ -178,4 +172,13 @@ public class PlayingSlotService {
         }
         playingSlotRepository.save(existingSlot);
     }
+
+    public void deletePlayingSlot(Long slotId) {
+        if (!playingSlotRepository.existsById(slotId)) {
+            throw new EntityNotFoundException("Playing slot not found!");
+        }        
+        playingSlotRepository.deleteById(slotId);
+    }
+
+
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,6 +37,12 @@ public class PlayingSlotController {
     public ResponseEntity<List<UnavailableSlotResponse>> getUnavailableSlots(@PathVariable Long slotId) {
         List<UnavailableSlotResponse> unavailableSlots = playingSlotService.getDisabledSlots(slotId);
         return ResponseEntity.ok(unavailableSlots);
+    }
+
+    @DeleteMapping("/{slotId}")
+    public ResponseEntity<String> deletePlayingSlot(@PathVariable Long slotId) {
+        playingSlotService.deletePlayingSlot(slotId);
+        return ResponseEntity.ok("Playing slot deleted successfully!");
     }
 
 

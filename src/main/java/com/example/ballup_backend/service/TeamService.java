@@ -144,7 +144,7 @@ public class TeamService {
     
 
         Long ownerId = teamMemberRepository.findOwnerByTeamId(teamId)
-            .orElse(null); // Trả về null nếu không có owner nào
+            .orElse(null); 
     
         boolean isOwner = ownerId != null && ownerId.equals(userId);
     
@@ -211,4 +211,21 @@ public class TeamService {
         List<TeamEntity> allTeams = teamMemberRepository.findTopTeamsWithMostMembers();
         return allTeams.size() > 6 ? allTeams.subList(0, 6) : allTeams;
     }
+
+    public List<TeamOverviewResponse> getMyTeams(Long userId) {
+        List<TeamEntity> teams = teamMemberRepository.findTeamsByUserId(userId)
+            .stream()
+            .collect(Collectors.toList());
+    
+        return teams.stream()
+            .map(team -> TeamOverviewResponse.builder()
+                .id(team.getId())
+                .name(team.getName())
+                .logo(team.getLogo())
+                .sport(team.getSport())
+                .totalMembers(teamMemberRepository.countByTeamId(team.getId())) 
+                .build())
+            .collect(Collectors.toList());
+    }
+    
 }

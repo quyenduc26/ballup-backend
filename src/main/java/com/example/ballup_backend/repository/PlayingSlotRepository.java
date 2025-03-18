@@ -24,5 +24,8 @@ public interface PlayingSlotRepository extends JpaRepository<PlayingSlotEntity, 
     @Query("SELECT ps FROM PlayingSlotEntity ps WHERE ps.playingCenter = :center")
     List<PlayingSlotEntity> findSlotsByCenter(@Param("center") PlayingCenterEntity center);
 
+    @Query("SELECT s FROM PlayingSlotEntity s WHERE s.playingCenter.id = :centerId")
+    List<PlayingSlotEntity> findByPlayingCenterId(@Param("centerId") Long centerId);
+
 
 }

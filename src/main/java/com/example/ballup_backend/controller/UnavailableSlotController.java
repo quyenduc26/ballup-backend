@@ -1,11 +1,10 @@
 package com.example.ballup_backend.controller;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,6 +33,18 @@ public class UnavailableSlotController {
     @GetMapping("/{slotId}/blocked")
     public List<UnavailableSlotResponse> getSlotUnavailable(@PathVariable Long slotId, @RequestParam Long startOfDay, @RequestParam Long endOfDay) {
         return unavailableSlotService.getUnavailableSlotsByDate(slotId, startOfDay, endOfDay);
+    }
+
+    @GetMapping("/slot/{slotId}")
+    public ResponseEntity<List<UnavailableSlotResponse>> getUnavailableSlotsBySlotId(@PathVariable Long slotId) {
+        List<UnavailableSlotResponse> responses = unavailableSlotService.getUnavailableSlotsById(slotId);
+        return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/center/{centerId}")
+    public ResponseEntity<List<UnavailableSlotResponse>> getUnavailableSlotsByCenterId(@PathVariable Long centerId) {
+        List<UnavailableSlotResponse> responses = unavailableSlotService.getUnavailableSlotsByCenterId(centerId);
+        return ResponseEntity.ok(responses);
     }
     
 }

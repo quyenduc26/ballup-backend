@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+
 @RestController
 @RequestMapping("/team")
 public class TeamController {
@@ -70,4 +71,12 @@ public class TeamController {
     public ResponseEntity<TeamOverviewResponse> getTeamByUserIdAndSport( @PathVariable Long teamId) {
         return ResponseEntity.ok(teamService.getTeamOverview(teamId));
     }
+
+    @GetMapping("/my-teams")
+    public ResponseEntity<List<TeamOverviewResponse>> getMyTeam(@RequestParam Long userId){
+        List<TeamOverviewResponse> teams = teamService.getMyTeams(userId);
+        return ResponseEntity.ok(teams);
+    }
+    
+
 }

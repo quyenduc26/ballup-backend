@@ -56,5 +56,9 @@ public interface TeamMemberRepository extends JpaRepository<TeamMemberEntity, Lo
     """)
     List<TeamEntity> findTopTeamsWithMostMembers();
 
+    @Query("SELECT tm.team FROM TeamMemberEntity tm WHERE tm.user.id = :userId")
+    List<TeamEntity> findTeamsByUserId(@Param("userId") Long userId);
+    
+
 }
 
