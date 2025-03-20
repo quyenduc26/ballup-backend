@@ -33,7 +33,9 @@ public class NotificationService {
         messagingTemplate.convertAndSend("/topic/owner/" + ownerId, message);
     }
 
-    public void createUserBookingNotification(UserEntity user, String message, BookingEntity booking, NotificationType type ) {
+
+    //create booking notificationfor user
+    public void createUserBookingNotification(UserEntity user, BookingEntity booking, NotificationType type ) {
         NotificationEntity notification = NotificationEntity.builder()
                 .forUser(user)
                 .type(type)
@@ -41,7 +43,6 @@ public class NotificationService {
                 .booking(booking)
                 .build();
         notification = notificationRepository.save(notification);
-
         NotificationResponse notificationResponse = NotificationResponse.builder()
             .id(notification.getId())
             .isRead(notification.isRead())
@@ -51,37 +52,58 @@ public class NotificationService {
         messagingTemplate.convertAndSend("/topic/user/" + user.getId(), notificationResponse);
     }
 
-    public void createUserTeamNotification(UserEntity user, String message, TeamEntity team, NotificationType type ) {
+    //create team notificastion for user
+    public void createUserTeamNotification(UserEntity user, TeamEntity team, NotificationType type ) {
         NotificationEntity notification = NotificationEntity.builder()
                 .forUser(user)
                 .type(type)
                 .isRead(false)
                 .team(team)
                 .build();
-        notificationRepository.save(notification);
-        messagingTemplate.convertAndSend("/topic/user/" + user.getId(), message);
+        notification = notificationRepository.save(notification);
+        NotificationResponse notificationResponse = NotificationResponse.builder()
+            .id(notification.getId())
+            .isRead(notification.isRead())
+            .bookingId(notification.getBooking().getId())
+            .type(notification.getType())
+            .build();
+        messagingTemplate.convertAndSend("/topic/user/" + user.getId(), notificationResponse);
     }
 
-    public void createUserGameNotification(UserEntity user, String message, GameEntity game, NotificationType type ) {
+    //create game notification for user
+    public void createUserGameNotification(UserEntity user, GameEntity game, NotificationType type ) {
         NotificationEntity notification = NotificationEntity.builder()
                 .forUser(user)
                 .type(type)
                 .isRead(false)
                 .game(game)
                 .build();
-        notificationRepository.save(notification);
-        messagingTemplate.convertAndSend("/topic/user/" + user.getId(), message);
+        notification = notificationRepository.save(notification);
+        NotificationResponse notificationResponse = NotificationResponse.builder()
+            .id(notification.getId())
+            .isRead(notification.isRead())
+            .bookingId(notification.getBooking().getId())
+            .type(notification.getType())
+            .build();
+        messagingTemplate.convertAndSend("/topic/user/" + user.getId(), notificationResponse);
     }
 
-    public void createOwnerBookingNotification(UserEntity owner, String message, BookingEntity booking, NotificationType type ) {
+    //create booking notification for owner
+    public void createOwnerBookingNotification(UserEntity owner, BookingEntity booking, NotificationType type ) {
         NotificationEntity notification = NotificationEntity.builder()
                 .forUser(owner)
                 .type(type)
                 .isRead(false)
                 .booking(booking)
                 .build();
-        notificationRepository.save(notification);
-        messagingTemplate.convertAndSend("/topic/user/" + owner.getId(), message);
+        notification = notificationRepository.save(notification);
+        NotificationResponse notificationResponse = NotificationResponse.builder()
+            .id(notification.getId())
+            .isRead(notification.isRead())
+            .bookingId(notification.getBooking().getId())
+            .type(notification.getType())
+            .build();
+        messagingTemplate.convertAndSend("/topic/owner/" + owner.getId(), notificationResponse);
     }
 
 }

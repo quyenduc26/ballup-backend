@@ -63,27 +63,33 @@ public class BookingService {
         }
         booking.setStatus(BookingEntity.BookingStatus.CONFIRMED);
         bookingRepository.save(booking);
-        notificationService.createUserBookingNotification(user, "Your booking is confirmed by owner", booking, NotificationType.BOOKING_CONFIRMED );
+        notificationService.createUserBookingNotification(user, booking, NotificationType.BOOKING_CONFIRMED );
     }
 
     public void cancelBookingRequest(Long bookingId) {
         BookingEntity booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
+        UserEntity user = booking.getBookingSlot().getSlot().getPlayingCenter().getOwner();
         if (booking.getStatus() != BookingEntity.BookingStatus.REQUESTED && booking.getStatus() != BookingEntity.BookingStatus.CONFIRMED) {
             throw new RuntimeException("Booking is not in REQUESTED or CONFIRMED status");
         }   
         booking.setStatus(BookingEntity.BookingStatus.CANCEL);
         bookingRepository.save(booking);
+        notificationService.createOwnerBookingNotification(user, booking, NotificationType.BOOKING_CANCELLED );
+
     }
 
     public void rejectBookingRequest(Long bookingId) {
         BookingEntity booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
+        UserEntity user = booking.getPayment().getCreator();
         if (booking.getStatus() != BookingEntity.BookingStatus.REQUESTED && booking.getStatus() != BookingEntity.BookingStatus.DEPOSITED) {
             throw new RuntimeException("Booking is not in REQUESTED status");
         }
         booking.setStatus(BookingEntity.BookingStatus.REJECTED);
         bookingRepository.save(booking);
+        notificationService.createUserBookingNotification(user, booking, NotificationType.BOOKING_REJECTED );
+
     }
 
     public void receivePaymentRequest(Long bookingId) {
@@ -92,6 +98,7 @@ public class BookingService {
         if (booking.getStatus() != BookingEntity.BookingStatus.DEPOSITED) {
             throw new RuntimeException("Booking is not in DEPOSITED status");
         }
+        UserEntity user = booking.getPayment().getCreator();
         booking.setStatus(BookingEntity.BookingStatus.COMPLETED);
 
         PaymentEntity payment = paymentRepository.getReferenceById(booking.getPayment().getId());
@@ -103,6 +110,9 @@ public class BookingService {
         bookingRepository.save(booking);
         paymentRepository.save(payment);
         unavailableSlotRepository.save(unavailableSlotEntity);
+        notificationService.createUserBookingNotification(user, booking, NotificationType.BOOKING_SUCCEEDED );
+
+
     }
 
     @Transactional
@@ -113,7 +123,7 @@ public class BookingService {
         if (booking.getStatus() != BookingEntity.BookingStatus.CONFIRMED) {
             throw new RuntimeException("Booking is not in CONFIRMED status");
         }
-
+        UserEntity user = booking.getBookingSlot().getSlot().getPlayingCenter().getOwner();
         //update status cho unavailable slot
         UnavailableSlotEntity unavailableSlot = unavailableSlotRepository.getReferenceById(booking.getBookingSlot().getId());
         unavailableSlot.setStatus(Status.PROCESSING);
@@ -122,6 +132,7 @@ public class BookingService {
         //save 
         booking.setStatus(BookingEntity.BookingStatus.DEPOSITED);
         bookingRepository.save(booking);
+        notificationService.createOwnerBookingNotification(user, booking, NotificationType.BOOKING_DEPOSITED );
     }
     
     public List<BookingRequestResponse> getAllBookingRequests(Long ownerId) {
