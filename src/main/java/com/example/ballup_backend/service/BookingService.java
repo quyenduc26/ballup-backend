@@ -13,6 +13,7 @@ import com.example.ballup_backend.dto.res.booking.BookingDetailResponse;
 import com.example.ballup_backend.entity.BookingEntity;
 import com.example.ballup_backend.entity.PaymentEntity;
 import com.example.ballup_backend.entity.BookingEntity.BookingStatus;
+import com.example.ballup_backend.entity.NotificationEntity.NotificationType;
 import com.example.ballup_backend.entity.PaymentEntity.PaymentStatus;
 import com.example.ballup_backend.entity.UnavailableSlotEntity.Status;
 import com.example.ballup_backend.entity.PlayingSlotEntity;
@@ -48,14 +49,21 @@ public class BookingService {
     @Autowired
     private PaymentRepository paymentRepository; 
 
+    @Autowired
+    private NotificationService notificationService;
+
+    @Transactional
     public void confirmBookingRequest(Long bookingId) {
         BookingEntity booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        UserEntity user = userRepository.getReferenceById(booking.getPayment().getCreator().getId());
         if (booking.getStatus() != BookingEntity.BookingStatus.REQUESTED) {
             throw new RuntimeException("Booking is not in REQUESTED status");
         }
         booking.setStatus(BookingEntity.BookingStatus.CONFIRMED);
         bookingRepository.save(booking);
+        notificationService.createUserBookingNotification(user, "Your booking is confirmed by owner", booking, NotificationType.BOOKING_CONFIRMED );
     }
 
     public void cancelBookingRequest(Long bookingId) {

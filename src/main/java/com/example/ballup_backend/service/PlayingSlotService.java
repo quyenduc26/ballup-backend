@@ -116,10 +116,11 @@ public class PlayingSlotService {
                 .bookingSlot(unavailableSlot)
                 .build();
             bookingRepository.save(bookingEntity);
+            
     
             return bookingEntity.getId();
         } else {
-            unavailableSlot = UnavailableSlotEntity.builder()  // Gán giá trị cho biến
+            unavailableSlot = UnavailableSlotEntity.builder() 
                 .fromTime(fromTimestamp)
                 .toTime(toTimestamp)
                 .slot(playingSlot)
