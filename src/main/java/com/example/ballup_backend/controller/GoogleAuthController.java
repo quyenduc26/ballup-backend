@@ -5,7 +5,6 @@ import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.view.RedirectView;
 
-import com.example.ballup_backend.config.GoogleOAuthConfig;
 import com.example.ballup_backend.entity.UserEntity.Role;
 import com.example.ballup_backend.projection.user.UserGoogleData;
 import com.example.ballup_backend.service.AuthService;
@@ -20,9 +19,6 @@ import java.util.HashMap;
 public class GoogleAuthController {
     private static final String TOKEN_URL = "https://oauth2.googleapis.com/token";
     private static final String USER_INFO_URL = "https://www.googleapis.com/oauth2/v2/userinfo";
-
-    @Autowired
-    private GoogleOAuthConfig googleOAuthConfig;
 
     @Autowired
     private AuthService authService;
@@ -45,9 +41,9 @@ public class GoogleAuthController {
         RestTemplate restTemplate = new RestTemplate();
         Map<String, String> body = new HashMap<>();
         body.put("code", code);
-        body.put("client_id", googleOAuthConfig.getClientId());
-        body.put("client_secret", googleOAuthConfig.getClientSecret());
-        body.put("redirect_uri", googleOAuthConfig.getRedirectUri());
+        body.put("client_id", System.getenv("GOOGLE_CLIENT_ID"));
+        body.put("client_secret", System.getenv("GOOGLE_CLIENT_SECRET"));
+        body.put("redirect_uri", System.getenv("GOOGLE_REDIRECT_URI"));        
         body.put("grant_type", "authorization_code");
 
         ResponseEntity<Map> response = restTemplate.postForEntity(TOKEN_URL, body, Map.class);
