@@ -133,6 +133,7 @@ public class PlayingCenterService {
                                 .name(playingCenter.getName())
                                 .description(playingCenter.getDescription())
                                 .address(playingCenter.getAddress())
+                                .sport(playingCenter.getType())
                                 .imageUrls(imageUrls)
                                 .slots(slotResponses)
                                 .build();
