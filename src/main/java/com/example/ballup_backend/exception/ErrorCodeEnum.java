@@ -18,6 +18,8 @@ public enum ErrorCodeEnum {
     CANNOT_KICK_SELF(1009, "Can not kick your self"),
     MEMBER_NOT_FOUND(1010, "Team member not found"),
     INVALID_PASSWORD(10011, "Invalid password"),
+    TEAM_NOT_FOUND(1012, "Team not found"),
+
 
     ;
 

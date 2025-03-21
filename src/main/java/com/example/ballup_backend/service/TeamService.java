@@ -6,6 +6,7 @@ import com.example.ballup_backend.dto.res.team.TeamDetailResponse;
 import com.example.ballup_backend.dto.res.team.TeamMemberResponse;
 import com.example.ballup_backend.dto.res.team.TeamOverviewResponse;
 import com.example.ballup_backend.dto.res.team.TeamResponse;
+import com.example.ballup_backend.entity.NotificationEntity.NotificationType;
 import com.example.ballup_backend.entity.TeamEntity;
 import com.example.ballup_backend.entity.TeamMemberEntity;
 import com.example.ballup_backend.entity.UserEntity;
@@ -40,6 +41,9 @@ public class TeamService {
 
     @Autowired
     private TeamMemberService teamMemberService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Transactional
     public void createTeam(CreateTeamRequest request) {
@@ -80,6 +84,8 @@ public class TeamService {
             .build();
     
         teamMemberRepository.save(teamMember);
+        UserEntity teamCreator = teamMemberRepository.findOwnerByTeamId(team.getId());
+        notificationService.createUserTeamNotification(teamCreator, team, NotificationType.TEAM_JOINED );
         return "User " + user.getUsername() + " has successfully joined the team: " + team.getName();
     }
     
@@ -143,7 +149,7 @@ public class TeamService {
         .collect(Collectors.toList());
     
 
-        Long ownerId = teamMemberRepository.findOwnerByTeamId(teamId)
+        Long ownerId = teamMemberRepository.findOwnerIdByTeamId(teamId)
             .orElse(null); 
     
         boolean isOwner = ownerId != null && ownerId.equals(userId);

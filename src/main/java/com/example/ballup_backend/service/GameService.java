@@ -29,6 +29,7 @@ import com.example.ballup_backend.entity.TeamEntity;
 import com.example.ballup_backend.entity.UnavailableSlotEntity;
 import com.example.ballup_backend.entity.UserEntity;
 import com.example.ballup_backend.entity.GamePlayerEntity.GameTeam;
+import com.example.ballup_backend.entity.NotificationEntity.NotificationType;
 import com.example.ballup_backend.entity.PaymentEntity.PaymentStatus;
 import com.example.ballup_backend.entity.UnavailableSlotEntity.Status;
 import com.example.ballup_backend.entity.UnavailableSlotEntity.createdBy;
@@ -96,6 +97,9 @@ public class GameService {
 
     @Autowired
     private PaymentRepository paymentRepository;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Transactional
     public void createGame(CreateGameRequest request) {
@@ -188,8 +192,17 @@ public class GameService {
             .build();
         }
         GameEntity savedGame = gameRepository.save(game);
-        gamePlayerService.addPlayersToGame(savedGame.getId(), request.getUserTeamId(), GameTeam.TEAMA, request.getMemberIdList());
+        gamePlayerService.addPlayersToGame(savedGame.getId(), request.getUserTeamId(), GameTeam.TEAMA, request.getMemberIdList());    
+
+        for (Long memberId : request.getMemberIdList()) {
+            if (!memberId.equals(creator.getId())) {
+                UserEntity member = userRepository.getReferenceById(memberId);
+                
+                notificationService.createUserGameNotification(member, savedGame, NotificationType.TEAM_JOINED);
+            }
+        }
     }
+        
 
 
     @Transactional
@@ -422,8 +435,13 @@ public class GameService {
 
     @Transactional
     public void leaveGame(Long gameId, Long userId) {
+        GameEntity game = gameRepository.getReferenceById(gameId);
+        UserEntity creator = userRepository.getReferenceById(game.getCreator().getId());
         gamePlayerRepository.deleteByGameIdAndUserId(gameId, userId);
         conversationMemberRepository.deleteByUserIdAndConversationId( userId, gameRepository.getReferenceById(gameId).getConversation().getId());
+
+        notificationService.createUserGameNotification(creator, game, NotificationType.BOOKING_CONFIRMED );
+
     }
     
     @Transactional
