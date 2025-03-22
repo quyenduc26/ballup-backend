@@ -20,7 +20,7 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-        .setAllowedOrigins("https://ballup-backend.onrender.com")
+        .setAllowedOrigins("https://ballup.vercel.app")
         .withSockJS();
     }
 
