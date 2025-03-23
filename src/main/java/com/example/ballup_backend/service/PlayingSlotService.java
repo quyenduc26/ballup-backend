@@ -118,7 +118,7 @@ public class PlayingSlotService {
             BookingEntity bookingEntity = BookingEntity.builder()
                 .status(BookingStatus.REQUESTED)
                 .payment(savedPaymentEntity)
-                .bookingSlot(unavailableSlot)
+                .bookingSlot(unavailableSlot)   
                 .build();
             BookingEntity savedBookingEntity = bookingRepository.save(bookingEntity);
             UserEntity owner = playingSlot.getPlayingCenter().getOwner();
