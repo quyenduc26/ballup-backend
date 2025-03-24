@@ -72,7 +72,7 @@ public class NotificationService {
         NotificationResponse notificationResponse = NotificationResponse.builder()
             .id(notification.getId())
             .isRead(notification.isRead())
-            .bookingId(notification.getBooking().getId())
+            .bookingId(notification.getBooking() != null ? notification.getBooking().getId() : null)
             .type(notification.getType())
             .build();
         messagingTemplate.convertAndSend("/topic/user/" + user.getId(), notificationResponse);

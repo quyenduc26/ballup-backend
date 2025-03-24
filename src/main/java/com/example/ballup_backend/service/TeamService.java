@@ -92,7 +92,6 @@ public class TeamService {
 
     public List<TeamResponse> getAllTeams(String name, String location, TeamEntity.SportType sport, String sortBy) {
         Specification<TeamEntity> spec = Specification.where(null);
-
         if (name != null && !name.isEmpty()) {
             spec = spec.and(TeamSpecification.filterByName(name));
         }
@@ -102,9 +101,7 @@ public class TeamService {
         if (sport != null) {
             spec = spec.and(TeamSpecification.filterBySport(sport));
         }
-
         List<TeamEntity> teams = teamRepository.findAll(spec);
-
         List<TeamResponse> teamResponses = teams.stream().map(team -> {
             Long totalMembers = teamMemberRepository.countByTeamId(team.getId());
             return TeamResponse.builder()
@@ -118,9 +115,7 @@ public class TeamService {
                     .totalMembers(totalMembers)
                     .build();
         }).collect(Collectors.toList());
-
         teamResponses.sort(Comparator.comparingLong((TeamResponse team) -> team.getTotalMembers() == null ? 0L : team.getTotalMembers()).reversed());
-
         return teamResponses;
     }
 
