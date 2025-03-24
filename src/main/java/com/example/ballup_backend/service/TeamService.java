@@ -213,9 +213,23 @@ public class TeamService {
             .build();
     }
 
-    public List<TeamEntity> getTeamForHomepage() {
+    public List<TeamResponse> getTeamForHomepage() {
         List<TeamEntity> allTeams = teamMemberRepository.findTopTeamsWithMostMembers();
-        return allTeams.size() > 6 ? allTeams.subList(0, 6) : allTeams;
+        List<TeamEntity> topTeams = allTeams.size() > 6 ? allTeams.subList(0, 6) : allTeams;
+    
+        return topTeams.stream().map(team -> {
+            Long totalMembers = teamMemberRepository.countByTeamId(team.getId());
+            return TeamResponse.builder()
+                    .id(team.getId())
+                    .name(team.getName())
+                    .address(team.getAddress())
+                    .intro(team.getIntro())
+                    .logo(team.getLogo())
+                    .cover(team.getCover())
+                    .sport(team.getSport())
+                    .totalMembers(totalMembers)
+                    .build();
+        }).collect(Collectors.toList());
     }
 
     public List<TeamOverviewResponse> getMyTeams(Long userId) {

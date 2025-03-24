@@ -534,7 +534,7 @@ public class GameService {
         }
 
         return upcomingGames.stream()
-            .limit(6)
+            .limit(3)
             .map(game -> {
                 List<Long> teamIds = gamePlayerRepository.findTeamIdsByGameId(game.getId());
                 List<GamePlayerEntity> players = gamePlayerRepository.findAllPlayersByGameId(game.getId());

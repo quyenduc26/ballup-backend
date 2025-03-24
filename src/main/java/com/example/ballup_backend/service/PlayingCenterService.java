@@ -3,6 +3,7 @@ package com.example.ballup_backend.service;
 import java.sql.Timestamp;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -259,5 +260,30 @@ public class PlayingCenterService {
                 playingCenterRepository.deleteById(id);
         }
 
+        public List<CardPlayingCenterResponse> getCenterForHomepage() {
+                List<PlayingCenterEntity> centers = playingCenterRepository.findAll();
+                Collections.shuffle(centers);
 
+                return centers.stream()
+                .limit(3)
+                .map(center -> {
+                        PlayingSlotEntity firstSlot = playingSlotRepository.findByPlayingCenter(center)
+                                .stream().findFirst().orElse(null);
+                        String image = playingCenterImageRepository.findByCenter(center)
+                                .stream().findFirst().map(PlayingCenterImageEntity::getImage).orElse(null);
+                        Long bookingCount = bookingRepository.countByPlayingCenter(center);
+
+                        return CardPlayingCenterResponse.builder()
+                                .id(center.getId())
+                                .name(center.getName())
+                                .address(center.getAddress())
+                                .type(center.getType())
+                                .bookingCount(bookingCount)
+                                .primaryPrice(firstSlot != null ? firstSlot.getPrimaryPrice() : null)
+                                .nightPrice(firstSlot != null ? firstSlot.getNightPrice() : null)
+                                .image(image)
+                                .build();
+                })
+                .collect(Collectors.toList());
+        }
 }
