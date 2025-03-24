@@ -17,6 +17,7 @@ import com.example.ballup_backend.entity.UnavailableSlotEntity;
 import com.example.ballup_backend.entity.UserEntity;
 import com.example.ballup_backend.entity.UserEntity.Role;
 import com.example.ballup_backend.entity.BookingEntity.BookingStatus;
+import com.example.ballup_backend.entity.NotificationEntity.NotificationType;
 import com.example.ballup_backend.entity.PaymentEntity;
 import com.example.ballup_backend.entity.PaymentEntity.PaymentStatus;
 import com.example.ballup_backend.entity.UnavailableSlotEntity.Status;
@@ -53,6 +54,10 @@ public class PlayingSlotService {
 
     @Autowired
     private PaymentRepository paymentRepository;
+
+    @Autowired
+    private NotificationService notificationService;
+
 
     public PlayingSlotEntity createPlayingSlot(CreateSlotRequest request) {
         PlayingCenterEntity playingCenter = playingCenterRepository.findById(request.getPlayingCenterId())
@@ -113,13 +118,15 @@ public class PlayingSlotService {
             BookingEntity bookingEntity = BookingEntity.builder()
                 .status(BookingStatus.REQUESTED)
                 .payment(savedPaymentEntity)
-                .bookingSlot(unavailableSlot)
+                .bookingSlot(unavailableSlot)   
                 .build();
-            bookingRepository.save(bookingEntity);
+            BookingEntity savedBookingEntity = bookingRepository.save(bookingEntity);
+            UserEntity owner = playingSlot.getPlayingCenter().getOwner();
+            notificationService.createOwnerBookingNotification(owner, savedBookingEntity, NotificationType.BOOKING_REQUESTED );
     
             return bookingEntity.getId();
         } else {
-            unavailableSlot = UnavailableSlotEntity.builder()  // Gán giá trị cho biến
+            unavailableSlot = UnavailableSlotEntity.builder() 
                 .fromTime(fromTimestamp)
                 .toTime(toTimestamp)
                 .slot(playingSlot)

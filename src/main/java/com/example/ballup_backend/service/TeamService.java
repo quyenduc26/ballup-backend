@@ -6,6 +6,7 @@ import com.example.ballup_backend.dto.res.team.TeamDetailResponse;
 import com.example.ballup_backend.dto.res.team.TeamMemberResponse;
 import com.example.ballup_backend.dto.res.team.TeamOverviewResponse;
 import com.example.ballup_backend.dto.res.team.TeamResponse;
+import com.example.ballup_backend.entity.NotificationEntity.NotificationType;
 import com.example.ballup_backend.entity.TeamEntity;
 import com.example.ballup_backend.entity.TeamMemberEntity;
 import com.example.ballup_backend.entity.UserEntity;
@@ -40,6 +41,9 @@ public class TeamService {
 
     @Autowired
     private TeamMemberService teamMemberService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Transactional
     public void createTeam(CreateTeamRequest request) {
@@ -80,13 +84,14 @@ public class TeamService {
             .build();
     
         teamMemberRepository.save(teamMember);
+        UserEntity teamCreator = teamMemberRepository.findOwnerByTeamId(team.getId());
+        notificationService.createUserTeamNotification(teamCreator, team, NotificationType.TEAM_JOINED );
         return "User " + user.getUsername() + " has successfully joined the team: " + team.getName();
     }
     
 
     public List<TeamResponse> getAllTeams(String name, String location, TeamEntity.SportType sport, String sortBy) {
         Specification<TeamEntity> spec = Specification.where(null);
-
         if (name != null && !name.isEmpty()) {
             spec = spec.and(TeamSpecification.filterByName(name));
         }
@@ -96,9 +101,7 @@ public class TeamService {
         if (sport != null) {
             spec = spec.and(TeamSpecification.filterBySport(sport));
         }
-
         List<TeamEntity> teams = teamRepository.findAll(spec);
-
         List<TeamResponse> teamResponses = teams.stream().map(team -> {
             Long totalMembers = teamMemberRepository.countByTeamId(team.getId());
             return TeamResponse.builder()
@@ -112,9 +115,7 @@ public class TeamService {
                     .totalMembers(totalMembers)
                     .build();
         }).collect(Collectors.toList());
-
         teamResponses.sort(Comparator.comparingLong((TeamResponse team) -> team.getTotalMembers() == null ? 0L : team.getTotalMembers()).reversed());
-
         return teamResponses;
     }
 
@@ -143,7 +144,7 @@ public class TeamService {
         .collect(Collectors.toList());
     
 
-        Long ownerId = teamMemberRepository.findOwnerByTeamId(teamId)
+        Long ownerId = teamMemberRepository.findOwnerIdByTeamId(teamId)
             .orElse(null); 
     
         boolean isOwner = ownerId != null && ownerId.equals(userId);
@@ -207,9 +208,23 @@ public class TeamService {
             .build();
     }
 
-    public List<TeamEntity> getTeamForHomepage() {
+    public List<TeamResponse> getTeamForHomepage() {
         List<TeamEntity> allTeams = teamMemberRepository.findTopTeamsWithMostMembers();
-        return allTeams.size() > 6 ? allTeams.subList(0, 6) : allTeams;
+        List<TeamEntity> topTeams = allTeams.size() > 6 ? allTeams.subList(0, 6) : allTeams;
+    
+        return topTeams.stream().map(team -> {
+            Long totalMembers = teamMemberRepository.countByTeamId(team.getId());
+            return TeamResponse.builder()
+                    .id(team.getId())
+                    .name(team.getName())
+                    .address(team.getAddress())
+                    .intro(team.getIntro())
+                    .logo(team.getLogo())
+                    .cover(team.getCover())
+                    .sport(team.getSport())
+                    .totalMembers(totalMembers)
+                    .build();
+        }).collect(Collectors.toList());
     }
 
     public List<TeamOverviewResponse> getMyTeams(Long userId) {

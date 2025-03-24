@@ -3,6 +3,7 @@ package com.example.ballup_backend.controller;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,12 +20,30 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.ballup_backend.dto.res.center.CardPlayingCenterResponse;
 import com.example.ballup_backend.dto.res.center.PlayingCenterResponse;
 import com.example.ballup_backend.dto.res.slot.PlayingSlotResponse;
+import com.example.ballup_backend.entity.PlayingCenterEntity;
+import com.example.ballup_backend.entity.PlayingCenterImageEntity;
+import com.example.ballup_backend.entity.PlayingSlotEntity;
+import com.example.ballup_backend.repository.BookingRepository;
+import com.example.ballup_backend.repository.PlayingCenterImageRepository;
+import com.example.ballup_backend.repository.PlayingCenterRepository;
+import com.example.ballup_backend.repository.PlayingSlotRepository;
 import com.example.ballup_backend.service.PlayingCenterService;
-
 
 @RestController
 @RequestMapping("center")
 public class PlayingCenterController {
+
+    @Autowired
+    PlayingCenterRepository playingCenterRepository;
+
+    @Autowired
+    PlayingSlotRepository playingSlotRepository;
+
+    @Autowired
+    PlayingCenterImageRepository playingCenterImageRepository;
+
+    @Autowired
+    BookingRepository bookingRepository;
 
     @Autowired
     PlayingCenterService playingCenterService;
@@ -38,18 +57,17 @@ public class PlayingCenterController {
     @GetMapping("/{centerId}/slot")
     public ResponseEntity<List<PlayingSlotResponse>> getSlotsByCenter(@PathVariable Long centerId) {
         List<PlayingSlotResponse> slots = playingCenterService.getPlayingSlotByCenterId(centerId)
-         .stream()
-        .map(slot -> PlayingSlotResponse.builder()
-            .id(slot.getId())
-            .name(slot.getName())
-            .primaryPrice(slot.getPrimaryPrice())
-            .nightPrice(slot.getNightPrice())
-            .build())
-        .collect(Collectors.toList());
+                .stream()
+                .map(slot -> PlayingSlotResponse.builder()
+                        .id(slot.getId())
+                        .name(slot.getName())
+                        .primaryPrice(slot.getPrimaryPrice())
+                        .nightPrice(slot.getNightPrice())
+                        .build())
+                .collect(Collectors.toList());
         return ResponseEntity.ok(slots);
     }
 
-    
     @GetMapping
     public ResponseEntity<List<CardPlayingCenterResponse>> searchPlayingCenters(
             @RequestParam(required = false) String name,
@@ -58,11 +76,13 @@ public class PlayingCenterController {
             @RequestParam(required = false) Long toTime,
             @RequestParam(required = false) String sport,
             @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "ASC") String sortDirection){
-    
-        List<CardPlayingCenterResponse> result = playingCenterService.getCenterByCriteria(name, address, fromTime, toTime, sortBy, sortDirection, sport);
+            @RequestParam(defaultValue = "ASC") String sortDirection) {
+
+        List<CardPlayingCenterResponse> result = playingCenterService.getCenterByCriteria(name, address, fromTime,
+                toTime, sortBy, sortDirection, sport);
         return ResponseEntity.ok(result);
     }
+
     
-    
+
 }
