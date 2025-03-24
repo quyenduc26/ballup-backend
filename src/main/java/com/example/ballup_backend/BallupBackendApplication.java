@@ -6,7 +6,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
-import io.github.cdimascio.dotenv.Dotenv;
+// import io.github.cdimascio.dotenv.Dotenv;
 
 
 @SpringBootApplication
@@ -14,8 +14,8 @@ import io.github.cdimascio.dotenv.Dotenv;
 public class BallupBackendApplication {
 
 	public static void main(String[] args) {
-		Dotenv dotenv = Dotenv.load();
-        dotenv.entries().forEach(entry -> System.setProperty(entry.getKey(), entry.getValue()));
+		// Dotenv dotenv = Dotenv.load();
+        // dotenv.entries().forEach(entry -> System.setProperty(entry.getKey(), entry.getValue()));
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 		SpringApplication.run(BallupBackendApplication.class, args);
 		
