@@ -120,6 +120,7 @@ public class PaymentMethodService {
             .orElseThrow(() -> new EntityNotFoundException("Booking not found with ID: " + bookingId));
 
         UserEntity owner = booking.getBookingSlot().getSlot().getPlayingCenter().getOwner();
+        System.out.println(owner.getId());
 
         return paymentMethodRepository.findActivePaymentMethodByOwnerId(owner.getId())
             .orElseThrow(() -> new EntityNotFoundException("No active payment method found for owner"));

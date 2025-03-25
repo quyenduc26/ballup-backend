@@ -54,7 +54,7 @@ public class NotificationService {
         NotificationResponse notificationResponse = NotificationResponse.builder()
             .id(notification.getId())
             .isRead(notification.isRead())
-            .bookingId(notification.getBooking().getId())
+            .bookingId(notification.getBooking() != null ? notification.getBooking().getId() : null)
             .type(notification.getType())
             .build();
         messagingTemplate.convertAndSend("/topic/user/" + user.getId(), notificationResponse);
@@ -90,7 +90,7 @@ public class NotificationService {
         NotificationResponse notificationResponse = NotificationResponse.builder()
             .id(notification.getId())
             .isRead(notification.isRead())
-            .bookingId(notification.getBooking().getId())
+            .gameId(notification.getGame() != null ? notification.getGame().getId() : null)
             .type(notification.getType())
             .build();
         messagingTemplate.convertAndSend("/topic/user/" + user.getId(), notificationResponse);
@@ -108,7 +108,7 @@ public class NotificationService {
         NotificationResponse notificationResponse = NotificationResponse.builder()
             .id(notification.getId())
             .isRead(notification.isRead())
-            .bookingId(notification.getBooking().getId())
+            .bookingId(notification.getBooking() != null ? notification.getBooking().getId() : null)
             .type(notification.getType())
             .build();
         messagingTemplate.convertAndSend("/topic/owner/" + owner.getId(), notificationResponse);
