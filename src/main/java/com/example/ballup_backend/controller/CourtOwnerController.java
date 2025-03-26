@@ -21,6 +21,7 @@ import com.example.ballup_backend.dto.req.owner.PaymentRequestResponse;
 import com.example.ballup_backend.dto.req.slot.CreateSlotRequest;
 import com.example.ballup_backend.dto.req.slot.DisableSlotRequest;
 import com.example.ballup_backend.dto.req.slot.UpdateSlotRequest;
+import com.example.ballup_backend.dto.res.booking.CompletedBookingResponse;
 import com.example.ballup_backend.dto.res.center.PlayingCenterResponse;
 import com.example.ballup_backend.service.BookingService;
 import com.example.ballup_backend.service.PlayingCenterService;
@@ -99,6 +100,12 @@ public class CourtOwnerController {
     public ResponseEntity<List<PaymentRequestResponse>> getRequestPayments(@PathVariable Long ownerId) {
         List<PaymentRequestResponse> bookingRequests = bookingService.getAllPaymentRequests(ownerId);
         return ResponseEntity.ok(bookingRequests);
+    }
+
+     @GetMapping("booking/completed/{ownerId}")
+    public ResponseEntity<List<CompletedBookingResponse>> getCompletedBookings(@PathVariable Long ownerId) {
+        List<CompletedBookingResponse> completedBookings = bookingService.getAllCompletedBookings(ownerId);
+        return ResponseEntity.ok(completedBookings);
     }
 
     //update 

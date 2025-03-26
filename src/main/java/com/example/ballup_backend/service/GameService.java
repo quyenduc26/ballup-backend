@@ -516,7 +516,7 @@ public class GameService {
         }
 
         return upcomingGames.stream()
-            .limit(6)
+            .limit(4)
             .map(game -> {
                 List<Long> teamIds = gamePlayerRepository.findTeamIdsByGameId(game.getId());
                 List<GamePlayerEntity> players = gamePlayerRepository.findAllPlayersByGameId(game.getId());
@@ -549,7 +549,7 @@ public class GameService {
               
 
                 TeamEntity teamA = !teamIds.isEmpty() ? teamRepository.getReferenceById(teamIds.get(0)) : null;
-                TeamEntity teamB = (teamIds.size() == 2) ? teamRepository.getReferenceById(teamIds.get(1)) : null;                
+                TeamEntity teamB = (teamIds.size() == 2) ? teamRepository.getReferenceById(teamIds.get(1)) : null;         
                 
                 return GameResponse.builder()
                     .id(game.getId())
@@ -570,13 +570,24 @@ public class GameService {
                         .members(teamAResponses)
                         .build()
                     )
-                    .teamB(!teamBResponses.isEmpty() ? 
-                        GameTeamResponse.builder()
-                        .name(teamB.getName())
-                        .intro(teamB.getIntro())
-                        .logo(teamB.getLogo())
-                        .members(teamBResponses)
-                        .build() : null
+                    .teamB(
+                        teamB == null 
+                            ? (!teamBResponses.isEmpty() 
+                                ? GameTeamResponse.builder()
+                                    .name("Challenge Team") // Tên mặc định khi teamB null nhưng có members
+                                    .intro(null) // Không có intro khi teamB null
+                                    .logo(null) // Không có logo khi teamB null
+                                    .members(teamBResponses)
+                                    .build()
+                                : null) // Nếu teamB null và teamBResponses rỗng thì gán null
+                            : (!teamBResponses.isEmpty() 
+                                ? GameTeamResponse.builder()
+                                    .name(teamB.getName() != null ? teamB.getName() : "Challenge Team")
+                                    .intro(teamB.getIntro() != null ? teamB.getIntro() : null)
+                                    .logo(teamB.getLogo() != null ? teamB.getLogo() : null)
+                                    .members(teamBResponses)
+                                    .build()
+                                : null) // Nếu teamB có nhưng không có thành viên thì vẫn để null
                     )
                     .build();
             })

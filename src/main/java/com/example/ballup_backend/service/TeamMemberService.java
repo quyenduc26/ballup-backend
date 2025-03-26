@@ -47,8 +47,12 @@ public class TeamMemberService {
                 .team(team)
                 .role(role)
                 .build();
-
-        return teamMemberRepository.save(teamMember);
+        teamMember = teamMemberRepository.save(teamMember);
+        UserEntity teamCreator = teamMemberRepository.findOwnerByTeamId(team.getId());
+        if(role != Role.OWNER) {
+            notificationService.createUserTeamNotification(teamCreator, team, NotificationType.TEAM_JOINED );
+        } 
+        return teamMember;
     }
 
     @Transactional

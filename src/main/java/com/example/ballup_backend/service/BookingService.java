@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.example.ballup_backend.dto.req.owner.BookingRequestResponse;
 import com.example.ballup_backend.dto.req.owner.PaymentRequestResponse;
 import com.example.ballup_backend.dto.res.booking.BookingDetailResponse;
+import com.example.ballup_backend.dto.res.booking.CompletedBookingResponse;
 import com.example.ballup_backend.entity.BookingEntity;
 import com.example.ballup_backend.entity.PaymentEntity;
 import com.example.ballup_backend.entity.BookingEntity.BookingStatus;
@@ -209,6 +210,41 @@ public class BookingService {
                     .status(booking.getStatus())
                     .build()
             ).collect(Collectors.toList());
+    }
+    
+    public List<CompletedBookingResponse> getAllCompletedBookings(Long ownerId) {
+        // Kiểm tra owner có tồn tại hay không
+        UserEntity owner = userRepository.findById(ownerId)
+                .orElseThrow(() -> new RuntimeException("Owner not found"));
+    
+        // Lấy danh sách các sân thuộc owner
+        List<Long> centerIds = playingCenterRepository.findCenterIdsByOwner(owner);
+        List<Long> slotIds = new ArrayList<>();
+        for (Long centerId : centerIds) {
+            for (PlayingSlotEntity slot : playingCenterService.getPlayingSlotByCenterId(centerId)) {
+                slotIds.add(slot.getId());
+            }
+        }
+    
+        // Lấy danh sách các booking đã hoàn tất
+        List<Long> unavailableSlotIds = unavailableSlotRepository.findBySlotIdAndCreatedByUser(slotIds);
+        List<BookingEntity> completedBookings = bookingRepository.findBookingsByUnavailableSlotsAndStatus(
+                BookingStatus.COMPLETED, unavailableSlotIds
+        );
+    
+        // Chuyển đổi danh sách booking thành response
+        return completedBookings.stream().map(booking -> 
+            CompletedBookingResponse.builder()
+                .id(booking.getId())
+                .slotId(booking.getBookingSlot().getId())
+                .creator(booking.getBookingSlot().getCreator().getUsername())
+                .centerName(booking.getBookingSlot().getSlot().getPlayingCenter().getName())
+                .fromTime(booking.getBookingSlot().getFromTime())
+                .toTime(booking.getBookingSlot().getToTime())
+                .amount(booking.getPayment().getAmount()) 
+                .createdAt(booking.getCreatedAt())
+                .build()
+        ).collect(Collectors.toList());
     }
     
 }
