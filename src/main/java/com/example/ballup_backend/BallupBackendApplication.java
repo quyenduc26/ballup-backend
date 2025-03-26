@@ -18,6 +18,7 @@ public class BallupBackendApplication {
         dotenv.entries().forEach(entry -> System.setProperty(entry.getKey(), entry.getValue()));
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 		SpringApplication.run(BallupBackendApplication.class, args);
+		
 		System.out.println("App run at : http://localhost:8080");
 	}
 
