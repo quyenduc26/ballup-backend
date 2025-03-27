@@ -234,23 +234,27 @@ public class GameService {
 
     @Transactional
     public List<GameResponse> getGamesWithOnlyTeamA(String name, String address, String sport) {
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        
         // Tạo specification để lọc game theo điều kiện
         Specification<GameEntity> spec = GameSpecification.filterGames(name, address, sport);
-    
-        // Lấy danh sách game theo filter
-        List<GameEntity> allGames = gameRepository.findAll(spec);
         
-        // Lọc ra các game chỉ có teamA
+        // Lấy danh sách game theo filter và đảm bảo game diễn ra trong tương lai
+        List<GameEntity> allGames = gameRepository.findAll(spec).stream()
+            .filter(game -> game.getFromTime().after(now)) // Lọc game có thời gian bắt đầu trong tương lai
+            .collect(Collectors.toList());
+        
+        // Lọc ra các game chưa đủ thành viên
         List<GameEntity> filteredGames = allGames.stream()
             .filter(game -> {
                 Integer gamePlayer = gamePlayerRepository.countPlayersByGameId(game.getId());
                 return gamePlayer != null && gamePlayer < game.getMembersRequired() * 2;
             })
             .collect(Collectors.toList());
-    
+
         return filteredGames.stream().map(game -> {
             List<GamePlayerEntity> players = gamePlayerRepository.findAllPlayersByGameId(game.getId());
-    
+
             // Chia danh sách người chơi thành 2 đội
             List<UserEntity> teamAPlayers = new ArrayList<>();
             List<UserEntity> teamBPlayers = new ArrayList<>();
@@ -264,7 +268,7 @@ public class GameService {
                     }
                 }
             }
-    
+
             // Chuyển đổi danh sách thành GameTeamMemberResponse
             List<GameTeamMemberResponse> teamAMembers = teamAPlayers.stream()
                 .map(user -> GameTeamMemberResponse.builder()
@@ -273,7 +277,7 @@ public class GameService {
                     .lastName(user.getLastName())
                     .build())
                 .collect(Collectors.toList());
-    
+
             List<GameTeamMemberResponse> teamBMembers = teamBPlayers.stream()
                 .map(user -> GameTeamMemberResponse.builder()
                     .avatar(user.getAvatar())
@@ -281,16 +285,16 @@ public class GameService {
                     .lastName(user.getLastName())
                     .build())
                 .collect(Collectors.toList());
-    
+
             // Lấy danh sách TeamEntity từ game
             List<Long> teamIds = gamePlayerRepository.findTeamIdsByGameId(game.getId());
             TeamEntity teamJoinedA = (!teamIds.isEmpty() && teamIds.get(0) != null) ? teamRepository.findById(teamIds.get(0)).orElse(null) : null;
             TeamEntity teamJoinedB = (teamIds.size() > 1 && teamIds.get(1) != null) ? teamRepository.findById(teamIds.get(1)).orElse(null) : null;
-    
+
             // Xây dựng response cho teamA và teamB
             GameTeamResponse teamA = null;
             GameTeamResponse teamB = null;
-    
+
             if (teamJoinedA != null) {
                 teamA = GameTeamResponse.builder()
                     .name(teamJoinedA.getName())
@@ -299,7 +303,7 @@ public class GameService {
                     .members(teamAMembers)
                     .build();
             }
-    
+
             if (teamJoinedB != null) {
                 teamB = GameTeamResponse.builder()
                     .name(teamJoinedB.getName())
@@ -308,7 +312,7 @@ public class GameService {
                     .members(teamBMembers)
                     .build();
             }
-    
+
             return GameResponse.builder()
                 .id(game.getId())
                 .name(game.getName())
@@ -326,7 +330,6 @@ public class GameService {
                 .build();
         }).collect(Collectors.toList());
     }
-    
 
 
     @Transactional

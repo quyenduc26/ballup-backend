@@ -101,34 +101,67 @@ public class BookingService {
         }
         UserEntity user = booking.getPayment().getCreator();
         booking.setStatus(BookingEntity.BookingStatus.COMPLETED);
-
+    
         PaymentEntity payment = paymentRepository.getReferenceById(booking.getPayment().getId());
         payment.setStatus(PaymentStatus.SUCCESS);
-
+    
         UnavailableSlotEntity unavailableSlotEntity = unavailableSlotRepository.getReferenceById(booking.getBookingSlot().getId());
         unavailableSlotEntity.setStatus(Status.DONE);
-
+    
+        // Cập nhật các slot có cùng thời gian thành PENDING
+        List<UnavailableSlotEntity> conflictingSlots = unavailableSlotRepository.findByFromTimeAndToTimeOfSlot(
+            unavailableSlotEntity.getFromTime(), unavailableSlotEntity.getToTime(), unavailableSlotEntity.getSlot().getId()
+        );
+    
+        List<Long> conflictingSlotIds = conflictingSlots.stream()
+                .map(UnavailableSlotEntity::getId)
+                .collect(Collectors.toList());
+    
+        List<BookingEntity> conflictingBookings = bookingRepository.findByBookingSlotIds(conflictingSlotIds);
+    
+        conflictingBookings = conflictingBookings.stream()
+                .filter(conflictBooking -> !conflictBooking.getId().equals(bookingId))
+                .collect(Collectors.toList());
+    
+        // Cập nhật trạng thái thành REJECTED và gửi thông báo
+        for (BookingEntity conflictBooking : conflictingBookings) {
+            conflictBooking.setStatus(BookingEntity.BookingStatus.REJECTED);
+            bookingRepository.save(conflictBooking);
+    
+            UserEntity conflictUser = conflictBooking.getPayment().getCreator();
+            notificationService.createUserBookingNotification(conflictUser, conflictBooking, NotificationType.BOOKING_LATE_PAID);
+        }
+    
         bookingRepository.save(booking);
         paymentRepository.save(payment);
         unavailableSlotRepository.save(unavailableSlotEntity);
-        notificationService.createUserBookingNotification(user, booking, NotificationType.BOOKING_SUCCEEDED );
-
-
+        notificationService.createUserBookingNotification(user, booking, NotificationType.BOOKING_SUCCEEDED);
     }
+    
+    
 
     @Transactional
     public void depositBookingRequest(Long bookingId) {
-
         //check valid
         BookingEntity booking = bookingRepository.getReferenceById(bookingId);
         if (booking.getStatus() != BookingEntity.BookingStatus.CONFIRMED) {
             throw new RuntimeException("Booking is not in CONFIRMED status");
         }
         UserEntity user = booking.getBookingSlot().getSlot().getPlayingCenter().getOwner();
+        
         //update status cho unavailable slot
         UnavailableSlotEntity unavailableSlot = unavailableSlotRepository.getReferenceById(booking.getBookingSlot().getId());
         unavailableSlot.setStatus(Status.PROCESSING);
-        unavailableSlotRepository.save(unavailableSlot); 
+        unavailableSlotRepository.save(unavailableSlot);
+        
+        // Cập nhật các slot có cùng thời gian thành PENDING
+        List<UnavailableSlotEntity> conflictingSlots = unavailableSlotRepository.findByFromTimeAndToTimeOfSlot(
+            unavailableSlot.getFromTime(), unavailableSlot.getToTime(), unavailableSlot.getSlot().getId()
+        );
+        for (UnavailableSlotEntity slot : conflictingSlots) {
+            slot.setStatus(Status.PENDING);
+        }
+        unavailableSlotRepository.saveAll(conflictingSlots);
         
         //save 
         booking.setStatus(BookingEntity.BookingStatus.DEPOSITED);
