@@ -3,6 +3,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -66,6 +67,10 @@ public class GameEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
     private SportType type;
+
+    @OneToMany(mappedBy = "game", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<NotificationEntity> notifications;
+
 
 }
 

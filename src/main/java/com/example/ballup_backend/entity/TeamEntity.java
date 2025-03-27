@@ -1,6 +1,7 @@
 package com.example.ballup_backend.entity;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -48,10 +49,12 @@ public class TeamEntity {
     @Column(name = "type", nullable = false)
     private SportType sport;
 
-
     public enum SportType {
         FOOTBALL, BADMINTON
     }
+
+    @OneToMany(mappedBy = "team", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<NotificationEntity> notifications;
 
     
 }
